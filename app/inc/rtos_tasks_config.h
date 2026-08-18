@@ -1,0 +1,16 @@
+#ifndef RTOS_TASKS_CONFIG_H
+#define RTOS_TASKS_CONFIG_H
+
+#define MOTION_TASK_PRIORITY      5
+#define MOTION_TASK_STACK_SIZE    512
+
+#define COMMS_TASK_PRIORITY       4
+#define COMMS_TASK_STACK_SIZE     512
+
+#define IO_TASK_PRIORITY          3
+#define IO_TASK_STACK_SIZE        256
+
+#define HEALTH_TASK_PRIORITY      6
+#define HEALTH_TASK_STACK_SIZE    256
+
+#endif // RTOS_TASKS_CONFIG_H
