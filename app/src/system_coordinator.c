@@ -1,21 +1,19 @@
 #include "system_coordinator.h"
+#include "bsp_adapters.h"
 
-// Forward declarations of hardware adapters
+// Forward declaration for protocol adapter
 extern void canfd_adapter_create(motor_protocol_adapter_t *adapter);
-extern void can_stm32f4_adapter_create(can_interface_t *adapter);
-extern void gpio_stm32f4_adapter_create(gpio_interface_t *adapter);
-extern void wdt_stm32f4_adapter_create(wdt_interface_t *adapter);
 
 system_coordinator_t g_sys;
 
 bool system_coordinator_init(system_coordinator_t *sys) {
     if (!sys) return false;
 
-    // 1. Initialize hardware adapters
-    wdt_stm32f4_adapter_create(&sys->hw_wdt);
-    can_stm32f4_adapter_create(&sys->can_dev);
-    gpio_stm32f4_adapter_create(&sys->brake_gpio);
-    gpio_stm32f4_adapter_create(&sys->endstop_gpio);
+    // 1. Initialize hardware adapters via platform BSP
+    bsp_wdt_adapter_create(&sys->hw_wdt);
+    bsp_can_adapter_create(&sys->can_dev);
+    bsp_gpio_adapter_create(&sys->brake_gpio);
+    bsp_gpio_adapter_create(&sys->endstop_gpio);
     canfd_adapter_create(&sys->protocol_adapter);
 
     // 2. Initialize Health Monitor & Task Watchdog

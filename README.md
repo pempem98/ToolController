@@ -94,9 +94,9 @@ cmake --build build
 
 #### 2. Kết quả xuất ra
 Sau khi build thành công, các file thực thi nằm tại thư mục `build/app/`:
-* `my_embedded_project_app.elf` — Dùng để Debug với ST-Link / J-Link trong VS Code hoặc IDE.
-* `my_embedded_project_app.bin` — File nhị phân nạp bằng STM32CubeProgrammer hoặc Bootloader.
-* `my_embedded_project_app.hex` — File Intel HEX cho các mạch nạp tiêu chuẩn.
+* `tool_controller_app.elf` — Dùng để Debug với ST-Link / J-Link trong VS Code hoặc IDE.
+* `tool_controller_app.bin` — File nhị phân nạp bằng STM32CubeProgrammer hoặc Bootloader.
+* `tool_controller_app.hex` — File Intel HEX cho các mạch nạp tiêu chuẩn.
 
 ---
 

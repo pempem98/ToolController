@@ -10,8 +10,6 @@ obj/
 *.obj
 
 # IDE specific files
-.vscode/
-.idea/
 *.suo
 *.user
 *.user*
