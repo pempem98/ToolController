@@ -1,0 +1,6 @@
+{
+    "targetPlatform": "stm32f407ve",
+    "targetInterface": "jtag",
+    "cortex-debug.armToolchainPath": "C:/Users/m920q/AppData/Local/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin",
+    "cortex-debug.JLinkGDBServerPath": "C:/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.jlink.win32_2.5.400.202603181158/tools/bin/JLinkGDBServerCL.exe"
+}

@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Ninja Build",
+            "type": "shell",
+            "command": "cmd.exe",
+            "args": [
+                "/c",
+                "cmake -B build -DPLATFORM=${config:targetPlatform} -DCMAKE_TOOLCHAIN_FILE=arm-none-eabi-gcc.cmake -G Ninja && cmake --build build"
+            ],
+            "options": {
+                "env": {
+                    "PATH": "${config:cortex-debug.armToolchainPath};${env:PATH}"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$gcc"
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug (J-Link)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/app/tool_controller_${config:targetPlatform}.elf",
+            "preLaunchTask": "Ninja Build",
+            "device": "${config:targetPlatform}",
+            "interface": "${config:targetInterface}",
+            "runToEntryPoint": "main",
+            "svdFile": "${workspaceFolder}/platform/${config:targetPlatform}/${config:targetPlatform}.svd",
+            "showDevDebugOutput": "none"
+        }
+    ]
+}
