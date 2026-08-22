@@ -2,6 +2,7 @@
 #define CAN_MOCK_H
 
 #include "can_interface.h"
+#include <stddef.h>
 
 static bool mock_can_init(can_interface_t *self, uint32_t baudrate) {
     (void)self; (void)baudrate;
@@ -23,13 +24,13 @@ static bool mock_can_set_filter(can_interface_t *self, uint32_t id, uint32_t mas
     return true;
 }
 
-inline void can_mock_create(can_interface_t *mock) {
+static inline void can_mock_create(can_interface_t *mock) {
     if (!mock) return;
     mock->init = mock_can_init;
     mock->send = mock_can_send;
     mock->receive = mock_can_receive;
     mock->set_filter = mock_can_set_filter;
-    mock->priv_data = nullptr;
+    mock->priv_data = NULL;
 }
 
 #endif // CAN_MOCK_H

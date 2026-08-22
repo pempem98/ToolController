@@ -1,5 +1,6 @@
 # Build directories
 build/
+build_tests/
 bin/
 obj/
 *.elf
@@ -8,6 +9,11 @@ obj/
 *.map
 *.o
 *.obj
+
+# Coverage temp files
+*.gcov
+*.gcda
+*.gcno
 
 # IDE specific files
 *.suo

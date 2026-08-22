@@ -2,6 +2,7 @@
 #define GPIO_MOCK_H
 
 #include "gpio_interface.h"
+#include <stddef.h>
 
 static gpio_state_t g_mock_gpio_state = GPIO_STATE_LOW;
 
@@ -30,14 +31,14 @@ static bool mock_gpio_attach_interrupt(gpio_interface_t *self, gpio_irq_callback
     return true;
 }
 
-inline void gpio_mock_create(gpio_interface_t *mock) {
+static inline void gpio_mock_create(gpio_interface_t *mock) {
     if (!mock) return;
     mock->init = mock_gpio_init;
     mock->write = mock_gpio_write;
     mock->read = mock_gpio_read;
     mock->toggle = mock_gpio_toggle;
     mock->attach_interrupt = mock_gpio_attach_interrupt;
-    mock->priv_data = nullptr;
+    mock->priv_data = NULL;
 }
 
 #endif // GPIO_MOCK_H

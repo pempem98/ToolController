@@ -2,23 +2,76 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Ninja Build",
+            "label": "Build Target Firmware",
             "type": "shell",
-            "command": "cmd.exe",
-            "args": [
-                "/c",
-                "cmake -B build -DPLATFORM=${config:targetPlatform} -DCMAKE_TOOLCHAIN_FILE=arm-none-eabi-gcc.cmake -G Ninja && cmake --build build"
-            ],
-            "options": {
-                "env": {
-                    "PATH": "${config:cortex-debug.armToolchainPath};${env:PATH}"
+            "windows": {
+                "command": "cmd.exe",
+                "args": [
+                    "/c",
+                    "cmake -B build -DPLATFORM=${config:targetPlatform} -DCMAKE_TOOLCHAIN_FILE=arm-none-eabi-gcc.cmake -G Ninja && cmake --build build"
+                ],
+                "options": {
+                    "env": {
+                        "PATH": "${config:cortex-debug.armToolchainPath};${env:PATH}"
+                    }
                 }
+            },
+            "linux": {
+                "command": "cmake -B build -DPLATFORM=${config:targetPlatform} -DCMAKE_TOOLCHAIN_FILE=arm-none-eabi-gcc.cmake -G Ninja && cmake --build build"
             },
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "problemMatcher": "$gcc"
+        },
+        {
+            "label": "Run Unit Tests",
+            "type": "shell",
+            "windows": {
+                "command": "cmd.exe",
+                "args": [
+                    "/c",
+                    "cmake -B build -DBUILD_TESTS=ON -DCMAKE_TLS_VERIFY=0 -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ && cmake --build build && ctest --test-dir build --output-on-failure"
+                ],
+                "options": {
+                    "env": {
+                        "PATH": "${env:PATH};${config:hostToolchainPath}"
+                    }
+                }
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "Generate Coverage HTML Report",
+            "type": "shell",
+            "windows": {
+                "command": "cmd.exe",
+                "args": [
+                    "/c",
+                    "cmake -B build -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON -DCMAKE_TLS_VERIFY=0 -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ && cmake --build build && ctest --test-dir build --output-on-failure && cmake -E make_directory build/tests/coverage && gcovr -r . --html --html-details -o build/tests/coverage/index.html --filter app/src/ --filter services/"
+                ],
+                "options": {
+                    "env": {
+                        "PATH": "${env:PATH};${config:hostToolchainPath};${config:pythonScriptsPath}"
+                    }
+                }
+            },
+            "linux": {
+                "command": "cmake -B build -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON -G Ninja && cmake --build build && ctest --test-dir build --output-on-failure && cmake -E make_directory build/tests/coverage && gcovr -r . --html --html-details -o build/tests/coverage/index.html --filter app/src/ --filter services/"
+            },
+            "group": "test",
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "Clean Build Directory",
+            "type": "shell",
+            "command": "cmake -E remove_directory build",
+            "problemMatcher": []
         }
     ]
 }
