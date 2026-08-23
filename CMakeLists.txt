@@ -4,6 +4,7 @@ project(my_embedded_project C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+set(PLATFORM "stm32f407ve" CACHE STRING "Target hardware platform (stm32f407ve, sim)")
 option(BUILD_TESTS "Build unit tests for host PC" OFF)
 option(ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
 
@@ -15,6 +16,9 @@ endif()
 
 # Include interfaces
 add_subdirectory(interfaces)
+
+# Include middleware
+add_subdirectory(middleware)
 
 # Include business logic services
 add_subdirectory(services/motion_service)

@@ -1,0 +1,40 @@
+name: ToolController CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ARM GCC Toolchain & Build Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi cmake ninja-build
+
+      - name: Cross-Compile Firmware
+        run: |
+          cmake -B build -DCMAKE_TOOLCHAIN_FILE=arm-none-eabi-gcc.cmake -DPLATFORM=stm32f407ve -G Ninja
+          cmake --build build
+
+      - name: Build & Run Host Unit Tests
+        run: |
+          cmake -B build_tests -DBUILD_TESTS=ON -G Ninja
+          cmake --build build_tests
+          ctest --test-dir build_tests --output-on-failure
+
+      - name: Upload Firmware Artifacts (.hex, .bin, .elf)
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: |
+            build/app/*.hex
+            build/app/*.bin
+            build/app/*.elf

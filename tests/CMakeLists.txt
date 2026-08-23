@@ -14,7 +14,7 @@ FetchContent_Declare(
     URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
 )
 # For Windows MSVC runtime flexibility if needed
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_executable(unit_tests
@@ -26,6 +26,18 @@ add_executable(unit_tests
     services/fieldbus_service/test_fieldbus_router.cpp
     services/io_service/test_brake_controller.cpp
     services/io_service/test_sensor_processor.cpp
+    middleware/test_freertos_osal.cpp
+    middleware/test_canopen_nmt.cpp
+    middleware/test_canopen_sdo.cpp
+    middleware/test_canopen_pdo.cpp
+    middleware/test_canopen_od.cpp
+    middleware/test_canopen_fd.cpp
+    middleware/test_ethercat_al.cpp
+    middleware/test_ethercat_coe.cpp
+    middleware/test_ethercat_soe.cpp
+    middleware/test_ethercat_eoe.cpp
+    middleware/test_ethercat_slave.cpp
+    services/motion_service/test_protocol_adapters.cpp
     ../app/src/system_coordinator.c
 )
 
@@ -33,6 +45,9 @@ target_include_directories(unit_tests PRIVATE
     mocks
     ../interfaces
     ../app/inc
+    ../middleware/freertos/inc
+    ../middleware/canopen_stack/inc
+    ../middleware/ethercat_stack/inc
 )
 
 target_link_libraries(unit_tests PRIVATE
@@ -41,6 +56,9 @@ target_link_libraries(unit_tests PRIVATE
     health_monitor
     fieldbus_service
     io_service
+    middleware_freertos
+    middleware_canopen
+    middleware_ethercat
 )
 
 include(GoogleTest)

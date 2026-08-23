@@ -29,12 +29,16 @@ target_link_libraries(${APP_NAME} PRIVATE
     health_monitor
     fieldbus_service
     io_service
+    middleware_freertos
 )
 
-# Post-build: Generate .hex and .bin files automatically
+# Post-build: Generate .hex and .bin files automatically for hardware targets
+if(NOT PLATFORM STREQUAL "sim")
 add_custom_command(TARGET ${APP_NAME} POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${APP_NAME}> ${CMAKE_CURRENT_BINARY_DIR}/${APP_NAME}.hex
     COMMAND ${CMAKE_OBJCOPY} -O binary -S $<TARGET_FILE:${APP_NAME}> ${CMAKE_CURRENT_BINARY_DIR}/${APP_NAME}.bin
     COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${APP_NAME}>
     COMMENT "Generating HEX and BIN binary files for ${APP_NAME}..."
 )
+endif()
+
