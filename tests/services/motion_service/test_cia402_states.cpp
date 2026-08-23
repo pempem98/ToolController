@@ -50,6 +50,8 @@ TEST(CiA402Test, ControlWordGeneration) {
 
     cw = cia402_generate_controlword(&fsm, CIA402_CMD_FAULT_RESET);
     EXPECT_EQ(cw & 0x0080, 0x0080);
+
+    cw = cia402_generate_controlword(&fsm, (cia402_command_t)99);
 }
 
 TEST(CiA402Test, GenerateControlwordNullSafe) {

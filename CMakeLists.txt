@@ -16,6 +16,9 @@ endif()
 # Include interfaces
 add_subdirectory(interfaces)
 
+# Include middleware
+add_subdirectory(middleware)
+
 # Include business logic services
 add_subdirectory(services/motion_service)
 add_subdirectory(services/health_monitor)

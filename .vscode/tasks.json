@@ -23,16 +23,27 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": "$gcc"
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error|note):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
         },
         {
-            "label": "Run Unit Tests",
+            "label": "Build Unit Tests",
             "type": "shell",
             "windows": {
                 "command": "cmd.exe",
                 "args": [
                     "/c",
-                    "cmake -B build -DBUILD_TESTS=ON -DCMAKE_TLS_VERIFY=0 -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ && cmake --build build && ctest --test-dir build --output-on-failure"
+                    "cmake -B build -DBUILD_TESTS=ON -DCMAKE_TLS_VERIFY=0 -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ && cmake --build build"
                 ],
                 "options": {
                     "env": {
@@ -40,20 +51,61 @@
                     }
                 }
             },
-            "group": {
-                "kind": "test",
-                "isDefault": true
+            "linux": {
+                "command": "cmake -B build -DBUILD_TESTS=ON -G Ninja && cmake --build build"
             },
-            "problemMatcher": "$gcc"
+            "group": "build",
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error|note):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
         },
         {
-            "label": "Generate Coverage HTML Report",
+            "label": "Run Unit Tests",
             "type": "shell",
+            "dependsOn": [
+                "Build Unit Tests"
+            ],
             "windows": {
                 "command": "cmd.exe",
                 "args": [
                     "/c",
-                    "cmake -B build -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON -DCMAKE_TLS_VERIFY=0 -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ && cmake --build build && ctest --test-dir build --output-on-failure && cmake -E make_directory build/tests/coverage && gcovr -r . --html --html-details -o build/tests/coverage/index.html --filter app/src/ --filter services/"
+                    "ctest --test-dir build --output-on-failure"
+                ],
+                "options": {
+                    "env": {
+                        "PATH": "${env:PATH};${config:hostToolchainPath}"
+                    }
+                }
+            },
+            "linux": {
+                "command": "ctest --test-dir build --output-on-failure"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Coverage HTML Report",
+            "type": "shell",
+            "dependsOn": [
+                "Run Unit Tests"
+            ],
+            "windows": {
+                "command": "cmd.exe",
+                "args": [
+                    "/c",
+                    "cmake -B build -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON -DCMAKE_TLS_VERIFY=0 -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ && cmake --build build && ctest --test-dir build --output-on-failure && cmake -E make_directory build/tests/coverage && gcovr -r . --html --html-details -o build/tests/coverage/index.html --exclude build/ --exclude tests/"
                 ],
                 "options": {
                     "env": {
@@ -62,10 +114,10 @@
                 }
             },
             "linux": {
-                "command": "cmake -B build -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON -G Ninja && cmake --build build && ctest --test-dir build --output-on-failure && cmake -E make_directory build/tests/coverage && gcovr -r . --html --html-details -o build/tests/coverage/index.html --filter app/src/ --filter services/"
+                "command": "cmake -B build -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON -G Ninja && cmake --build build && ctest --test-dir build --output-on-failure && cmake -E make_directory build/tests/coverage && gcovr -r . --html --html-details -o build/tests/coverage/index.html --exclude build/ --exclude tests/"
             },
             "group": "test",
-            "problemMatcher": "$gcc"
+            "problemMatcher": []
         },
         {
             "label": "Clean Build Directory",
