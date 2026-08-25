@@ -1,4 +1,4 @@
-#include "bsp_adapters.h"
+#include "board_adapters.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -128,7 +128,7 @@ static bool can_sim_set_filter(can_interface_t *self, uint32_t id, uint32_t mask
     return true;
 }
 
-void bsp_can_adapter_create(can_interface_t *adapter) {
+void board_can_adapter_create(can_interface_t *adapter) {
     if (!adapter) return;
     adapter->init = can_sim_init;
     adapter->send = can_sim_send;

@@ -1,4 +1,4 @@
-#include "bsp_adapters.h"
+#include "board_adapters.h"
 #include <stdio.h>
 
 typedef struct {
@@ -40,7 +40,7 @@ static bool sensor_sim_read_raw_adc(sensor_interface_t *self, uint16_t *adc_val)
     return true;
 }
 
-void bsp_sensor_adapter_create(sensor_interface_t *adapter) {
+void board_sensor_adapter_create(sensor_interface_t *adapter) {
     if (!adapter) return;
     adapter->init = sensor_sim_init;
     adapter->read_position = sensor_sim_read_position;

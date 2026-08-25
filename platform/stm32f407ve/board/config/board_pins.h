@@ -1,5 +1,5 @@
-#ifndef BSP_PINS_H
-#define BSP_PINS_H
+#ifndef BOARD_PINS_H
+#define BOARD_PINS_H
 
 // Pin mapping for STM32F407VET6 board
 #define BRAKE_1_PIN         GPIO_PIN_0
@@ -18,4 +18,4 @@
 #define ETHERCAT_SPI_CS_PIN GPIO_PIN_4
 #define ETHERCAT_SPI_CS_PORT GPIOA
 
-#endif // BSP_PINS_H
+#endif // BOARD_PINS_H

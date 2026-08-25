@@ -1,5 +1,5 @@
 #include "system_coordinator.h"
-#include "bsp_adapters.h"
+#include "board_adapters.h"
 
 // Forward declaration for protocol adapter
 extern void canfd_adapter_create(motor_protocol_adapter_t *adapter);
@@ -9,11 +9,11 @@ system_coordinator_t g_sys;
 bool system_coordinator_init(system_coordinator_t *sys) {
     if (!sys) return false;
 
-    // 1. Initialize hardware adapters via platform BSP
-    bsp_wdt_adapter_create(&sys->hw_wdt);
-    bsp_can_adapter_create(&sys->can_dev);
-    bsp_gpio_adapter_create(&sys->brake_gpio);
-    bsp_gpio_adapter_create(&sys->endstop_gpio);
+    // 1. Initialize hardware adapters via platform board
+    board_wdt_adapter_create(&sys->hw_wdt);
+    board_can_adapter_create(&sys->can_dev);
+    board_gpio_adapter_create(&sys->brake_gpio);
+    board_gpio_adapter_create(&sys->endstop_gpio);
     canfd_adapter_create(&sys->protocol_adapter);
 
     // 2. Initialize Health Monitor & Task Watchdog

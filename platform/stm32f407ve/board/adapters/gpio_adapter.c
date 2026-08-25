@@ -1,4 +1,4 @@
-#include "bsp_adapters.h"
+#include "board_adapters.h"
 #include "gpio.h"
 #include <stddef.h>
 
@@ -28,7 +28,7 @@ static bool gpio_adapter_attach_interrupt(gpio_interface_t *self, gpio_irq_callb
     return true;
 }
 
-void bsp_gpio_adapter_create(gpio_interface_t *adapter) {
+void board_gpio_adapter_create(gpio_interface_t *adapter) {
     if (!adapter) return;
     adapter->init = gpio_adapter_init;
     adapter->write = gpio_adapter_write;

@@ -1,4 +1,4 @@
-#include "bsp_adapters.h"
+#include "board_adapters.h"
 #include <stddef.h>
 
 static bool wdt_adapter_init(wdt_interface_t *self, uint32_t timeout_ms) {
@@ -12,7 +12,7 @@ static void wdt_adapter_feed(wdt_interface_t *self) {
     // Call HAL_IWDG_Refresh()
 }
 
-void bsp_wdt_adapter_create(wdt_interface_t *adapter) {
+void board_wdt_adapter_create(wdt_interface_t *adapter) {
     if (!adapter) return;
     adapter->init = wdt_adapter_init;
     adapter->feed = wdt_adapter_feed;

@@ -1,4 +1,4 @@
-#include "bsp_adapters.h"
+#include "board_adapters.h"
 #include "can.h"
 #include <stddef.h>
 
@@ -26,7 +26,7 @@ static bool can_adapter_set_filter(can_interface_t *self, uint32_t id, uint32_t 
     return true;
 }
 
-void bsp_can_adapter_create(can_interface_t *adapter) {
+void board_can_adapter_create(can_interface_t *adapter) {
     if (!adapter) return;
     adapter->init = can_adapter_init;
     adapter->send = can_adapter_send;

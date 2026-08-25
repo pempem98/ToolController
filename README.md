@@ -58,10 +58,12 @@ ToolController/
 │   ├── fieldbus_service/       # Điều hướng gói tin Fieldbus (Fieldbus Router)
 │   └── io_service/             # Xử lý Phanh (Brake Controller) & Cảm biến (Sensor Processor)
 ├── platform/                   # Lớp driver và mã sinh tự động theo từng dòng chip
-│   └── stm32f4/                # Nền tảng STM32F4 (F407VET6)
-│       ├── bsp/                # BSP Pins (`bsp_pins.h`), `FreeRTOSConfig.h`
-│       ├── cubemx/             # Thư viện sinh tự động từ STM32CubeMX (Core, Drivers, .ioc)
-│       └── driver_adapter/     # Mã chuyển đổi (Adapter) từ HAL ST sang interfaces chuẩn
+│   └── stm32f407ve/            # Nền tảng STM32F4 (F407VET6)
+│       ├── board/              # Mã dành riêng cho Bo mạch (Board Level)
+│       │   ├── config/         # Cấu hình phần cứng (`board_pins.h`), RTOS (`FreeRTOSConfig.h`)
+│       │   ├── adapters/       # Mã chuyển đổi (Adapter) từ HAL ST sang interfaces chuẩn
+│       │   └── board_adapters.h # Khai báo các hàm khởi tạo adapter cho board
+│       └── cubemx/             # Thư viện sinh tự động từ STM32CubeMX (Core, Drivers, .ioc)
 ├── tests/                      # Unit test chạy trên PC (Host PC build qua GoogleTest)
 ├── arm-none-eabi-gcc.cmake     # File cấu hình Toolchain biên dịch chéo ARM GNU
 ├── CMakeLists.txt              # CMake điều khiển gốc toàn dự án

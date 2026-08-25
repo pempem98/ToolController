@@ -1,4 +1,4 @@
-#include "bsp_adapters.h"
+#include "board_adapters.h"
 #include <stdio.h>
 
 typedef struct {
@@ -49,7 +49,7 @@ static bool gpio_sim_attach_interrupt(gpio_interface_t *self, gpio_irq_callback_
 static sim_gpio_priv_t g_sim_gpio_instances[4];
 static uint8_t g_gpio_idx = 0;
 
-void bsp_gpio_adapter_create(gpio_interface_t *adapter) {
+void board_gpio_adapter_create(gpio_interface_t *adapter) {
     if (!adapter) return;
     uint8_t idx = g_gpio_idx % 4;
     g_gpio_idx++;

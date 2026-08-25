@@ -1,4 +1,4 @@
-#include "bsp_adapters.h"
+#include "board_adapters.h"
 #include <stdio.h>
 
 typedef struct {
@@ -23,7 +23,7 @@ static void wdt_sim_feed(wdt_interface_t *self) {
     g_sim_wdt_priv.feed_count++;
 }
 
-void bsp_wdt_adapter_create(wdt_interface_t *adapter) {
+void board_wdt_adapter_create(wdt_interface_t *adapter) {
     if (!adapter) return;
     adapter->init = wdt_sim_init;
     adapter->feed = wdt_sim_feed;
