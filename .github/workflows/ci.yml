@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   # ============================================================================
-  # 1. BIÊN DỊCH FIRMWARE STM32H7 (XUẤT FILE HEX, BIN, ELF)
+  # 1. BIÊN DỊCH FIRMWARE STM32H7 (XUẤT HEX, BIN, ELF, BUILD FOLDER & SOURCE CODE)
   # ============================================================================
   build-firmware:
     name: 🛠️ Build Firmware (STM32H7)
@@ -53,6 +53,12 @@ jobs:
           arm-none-eabi-size build/app/tool_controller_stm32h7a3ziq.elf >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
+      - name: Package Source Code Snapshot (Clean Git Archive)
+        run: |
+          mkdir -p release_packages
+          git archive --format=zip --output=release_packages/tool_controller_source_${GITHUB_SHA::7}.zip HEAD
+
+      # 1. Package: Firmware Binaries (.hex, .bin, .elf)
       - name: Upload Firmware Artifacts (.hex, .bin, .elf)
         uses: actions/upload-artifact@v4
         with:
@@ -61,6 +67,22 @@ jobs:
             build/app/*.hex
             build/app/*.bin
             build/app/*.elf
+          if-no-files-found: error
+
+      # 2. Package: Entire Firmware Build Folder (map, asm, objects, binaries)
+      - name: Upload Firmware Build Folder (build/)
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-build-folder
+          path: build/
+          if-no-files-found: error
+
+      # 3. Package: Complete Source Code Archive
+      - name: Upload Source Code Archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-code
+          path: release_packages/tool_controller_source_*.zip
           if-no-files-found: error
 
   # ============================================================================
@@ -132,9 +154,18 @@ jobs:
             --exclude build \
             --markdown >> $GITHUB_STEP_SUMMARY
 
+      # 4. Package: Interactive HTML Coverage Report
       - name: Upload HTML Coverage Report Artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report-html
           path: build/coverage_report/
+          if-no-files-found: error
+
+      # 5. Package: Entire Unit Tests Build Folder (gcda, gcno, test binary)
+      - name: Upload Unit Tests Build Folder (build/)
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-build-folder
+          path: build/
           if-no-files-found: error

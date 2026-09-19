@@ -1,0 +1,43 @@
+# ==============================================================================
+# Docker Ignore Configuration for ToolController
+# Loại trừ các file build, git, và tài nguyên nặng để tối ưu build context (< 5MB)
+# ==============================================================================
+
+# Thư mục biên dịch (nặng hàng trăm MB)
+build/
+build*/
+bin/
+obj/
+
+# Quản lý phiên bản Git
+.git/
+.gitignore
+
+# Môi trường Agent & Brain cache
+.agent/
+.system_generated/
+
+# Cấu hình IDE cá nhân
+.vscode/
+.idea/
+*.swp
+*.bak
+
+# Các file nhị phân firmware đầu ra
+*.hex
+*.bin
+*.elf
+*.map
+*.o
+*.obj
+*.a
+*.lib
+
+# Báo cáo coverage
+coverage/
+coverage_report/
+*.gcda
+*.gcno
+*.gcov
+coverage.info
+test_results.log
