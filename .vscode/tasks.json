@@ -7,7 +7,7 @@
                 "args": ["/d", "/c"]
             },
             "env": {
-                "PATH": "${env:LOCALAPPDATA}\\Programs\\Python\\Python313\\Scripts;${env:LOCALAPPDATA}\\Programs\\Python\\Python313;${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Packages\\BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\mingw64\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\gnu-tools-for-stm32\\14.3.1+st.2\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\cmake\\4.3.1+st.1\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\ninja\\1.13.2+st.1\\bin;${env:PATH}"
+                "PATH": "${env:LOCALAPPDATA}\\Programs\\Python\\Python313\\Scripts;${env:LOCALAPPDATA}\\Programs\\Python\\Python313;${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Packages\\BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\mingw64\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\programmer\\2.23.0\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\stlink-gdbserver\\7.14.0+st.2\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\gnu-tools-for-stm32\\14.3.1+st.2\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\cmake\\4.3.1+st.1\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\ninja\\1.13.2+st.1\\bin;${env:PATH}"
             }
         }
     },
@@ -21,6 +21,17 @@
                 "isDefault": true
             },
             "problemMatcher": "$gcc"
+        },
+        {
+            "label": "Flash Firmware to Board (ST-LINK)",
+            "type": "shell",
+            "command": "STM32_Programmer_CLI -c port=SWD -w build/app/tool_controller_stm32h7a3ziq.hex -v -rst",
+            "dependsOn": "Build Firmware",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": []
         },
         {
             "label": "Rebuild Firmware (Clean & Build)",
