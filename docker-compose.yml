@@ -1,0 +1,24 @@
+services:
+  toolcontroller-builder:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: toolcontroller-env:1.0
+    container_name: toolcontroller_build_env
+    # Tự động gán quyền sở hữu file theo UID và GID của máy Host (mặc định 1000:1000 cho Linux/WSL)
+    # Giúp Kỹ sư V có thể chỉnh sửa/xóa thư mục build trên máy Host mà không bị kẹt quyền root
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - .:/workspace/ToolController
+    working_dir: /workspace/ToolController
+    environment:
+      - HOME=/tmp
+    # Chạy lệnh mặc định hiển thị phiên bản toolchains nếu không truyền tham số
+    command: >
+      bash -c "echo '=== ToolController Build Environment ===' &&
+               gcc --version | head -n 1 &&
+               arm-none-eabi-gcc --version | head -n 1 &&
+               cmake --version | head -n 1 &&
+               ninja --version &&
+               gcovr --version | head -n 1"
+

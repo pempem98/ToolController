@@ -1,0 +1,16 @@
+{
+    "cmake.generator": "Ninja",
+
+    // Host Debugger & Toolchain binaries (Isolated in settings.json only)
+    "cortex-debug.stlinkPath": "${env:SystemDrive}/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.win32_2.2.500.202604010938/tools/bin/ST-LINK_gdbserver.exe",
+    "cortex-debug.stm32cubeprogrammer": "${env:SystemDrive}/ST/STM32CubeIDE_2.2.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.win32_2.2.500.202603051304/tools/bin",
+    "cortex-debug.armToolchainPath": "${env:LOCALAPPDATA}/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin",
+
+    // Environment PATH configuration
+    "cmake.environment": {
+        "PATH": "${env:LOCALAPPDATA}/Programs/Python/Python313/Scripts;${env:LOCALAPPDATA}/Programs/Python/Python313;${env:LOCALAPPDATA}/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin;${env:LOCALAPPDATA}/stm32cube/bundles/ninja/1.13.2+st.1/bin;${env:LOCALAPPDATA}/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin;${env:LOCALAPPDATA}/stm32cube/bundles/cmake/4.3.1+st.1/bin;/usr/bin;/usr/local/bin:${env:PATH}"
+    },
+    "terminal.integrated.env.windows": {
+        "PATH": "${env:LOCALAPPDATA}\\Programs\\Python\\Python313\\Scripts;${env:LOCALAPPDATA}\\Programs\\Python\\Python313;${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Packages\\BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\mingw64\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\gnu-tools-for-stm32\\14.3.1+st.2\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\cmake\\4.3.1+st.1\\bin;${env:LOCALAPPDATA}\\stm32cube\\bundles\\ninja\\1.13.2+st.1\\bin;${env:PATH}"
+    }
+}

@@ -1,0 +1,128 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 20,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "stm32h7",
+            "displayName": "STM32H7A3ZI (Target MCU)",
+            "description": "Cross-compile for STM32H7A3ZI using ARM GNU Toolchain",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "environment": {
+                "ARM_TOOLCHAIN_PATH": "$env{LOCALAPPDATA}/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin"
+            },
+            "cacheVariables": {
+                "PLATFORM": "stm32h7a3ziq",
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/arm-none-eabi-gcc.cmake",
+                "BUILD_TESTS": "OFF",
+                "ENABLE_COVERAGE": "OFF"
+            }
+        },
+        {
+            "name": "host-tests",
+            "displayName": "Host PC Tests (SIL)",
+            "description": "Build and run Unity unit tests on host PC without MCU",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "environment": {
+                "PATH": "$env{LOCALAPPDATA}/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin;$penv{PATH}"
+            },
+            "cacheVariables": {
+                "PLATFORM": "host",
+                "BUILD_TESTS": "ON",
+                "ENABLE_COVERAGE": "OFF",
+                "CMAKE_TLS_VERIFY": "OFF"
+            }
+        },
+        {
+            "name": "coverage",
+            "displayName": "Host Tests with Coverage (gcovr)",
+            "description": "Build unit tests with code coverage flags enabled",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "environment": {
+                "PATH": "$env{LOCALAPPDATA}/Programs/Python/Python313/Scripts;$env{LOCALAPPDATA}/Programs/Python/Python313;$env{LOCALAPPDATA}/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin;$penv{PATH}"
+            },
+            "cacheVariables": {
+                "PLATFORM": "host",
+                "BUILD_TESTS": "ON",
+                "ENABLE_COVERAGE": "ON",
+                "CMAKE_TLS_VERIFY": "OFF"
+            }
+        },
+        {
+            "name": "linux-stm32h7",
+            "displayName": "Linux/Docker: STM32H7 Firmware",
+            "description": "Build STM32H7 firmware in Linux / Docker / WSL",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "PLATFORM": "stm32h7a3ziq",
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/arm-none-eabi-gcc.cmake",
+                "BUILD_TESTS": "OFF",
+                "ENABLE_COVERAGE": "OFF"
+            }
+        },
+        {
+            "name": "linux-coverage",
+            "displayName": "Linux/Docker: Unity Tests & Coverage",
+            "description": "Run Unity unit tests and generate coverage in Linux / Docker / WSL",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "PLATFORM": "host",
+                "BUILD_TESTS": "ON",
+                "ENABLE_COVERAGE": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "stm32h7",
+            "configurePreset": "stm32h7"
+        },
+        {
+            "name": "host-tests",
+            "configurePreset": "host-tests"
+        },
+        {
+            "name": "coverage",
+            "configurePreset": "coverage"
+        },
+        {
+            "name": "linux-stm32h7",
+            "configurePreset": "linux-stm32h7"
+        },
+        {
+            "name": "linux-coverage",
+            "configurePreset": "linux-coverage"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "host-tests",
+            "configurePreset": "host-tests",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "coverage",
+            "configurePreset": "coverage",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "linux-coverage",
+            "configurePreset": "linux-coverage",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
+    ]
+}

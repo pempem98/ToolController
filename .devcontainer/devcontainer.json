@@ -1,0 +1,25 @@
+{
+  "name": "ToolController Embedded Dev Container",
+  "build": {
+    "dockerfile": "../docker/Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspace/ToolController",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "cmake.cmakePath": "/usr/local/bin/cmake",
+        "cmake.generator": "Ninja",
+        "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+      },
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "twxs.cmake",
+        "marus25.cortex-debug"
+      ]
+    }
+  },
+  "remoteUser": "root"
+}
+
