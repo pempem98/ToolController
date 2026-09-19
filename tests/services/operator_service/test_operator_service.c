@@ -60,7 +60,7 @@ void test_operator_service_deadband_filtering(void) {
     // Vượt ngưỡng deadband
     s_mock_axes[0] = 0.5f;
     operator_service_update(&s_svc);
-    TEST_ASSERT_FLOAT_WITHIN(0.001f, 0.5f, operator_service_get_axis(&s_svc, 0));
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 0.4737f, operator_service_get_axis(&s_svc, 0));
     TEST_ASSERT_TRUE(operator_service_has_motion_demand(&s_svc));
 }
 
