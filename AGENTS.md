@@ -22,7 +22,7 @@ Toàn bộ chi tiết kỹ thuật được định nghĩa tại các rules con:
   - *Comments*: Chuẩn Doxygen (`@brief`, `@param[in/out]`, `@return`, `@note`, `@warning`).
   - *MISRA & Memory*: `<stdint.h>`, `const` correctness, cấm dynamic memory trong runtime loop, cờ chia sẻ dùng `volatile`, DMA cache alignment 32-byte.
 - **Commit Format**: Xem chi tiết tại [`.agent/rules/commit_standards.md`](.agent/rules/commit_standards.md)
-  - Cấu trúc: `<type>(<scope>): <mô tả>` (Ví dụ: `feat(canopen): ...`, `fix(stm32h7/dma): ...`, `test(motion_service): ...`).
+  - Cấu trúc: `<type>(<scope>): <mô tả>` (Ví dụ: `feat(canopen): ...`, `fix(stm32h7a3zit6q/dma): ...`, `test(motion_service): ...`).
 
 ## 4. Quản Lý & Điều Hướng Artifacts (Plan, Walkthrough, Báo Cáo)
 - **Tự động cung cấp Direct File Link**: Mỗi khi tạo hoặc cập nhật các file Artifact (như `implementation_plan.md`, `walkthrough.md`, báo cáo kiến trúc), **bắt buộc** phải chèn sẵn đường dẫn liên kết dạng `file:///...` nổi bật ngay trong câu trả lời.

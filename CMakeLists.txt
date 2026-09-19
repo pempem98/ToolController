@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 if(NOT DEFINED PLATFORM OR PLATFORM MATCHES "^\\$\\{" OR PLATFORM STREQUAL "")
-    set(PLATFORM "stm32h7a3ziq" CACHE STRING "Target hardware platform (stm32h7a3ziq, host)" FORCE)
+    set(PLATFORM "stm32h7a3zit6q" CACHE STRING "Target hardware platform (stm32h7a3zit6q, host)" FORCE)
 endif()
 
 if(NOT CMAKE_TOOLCHAIN_FILE AND NOT PLATFORM STREQUAL "host" AND NOT BUILD_TESTS)
@@ -9,9 +9,9 @@ if(NOT CMAKE_TOOLCHAIN_FILE AND NOT PLATFORM STREQUAL "host" AND NOT BUILD_TESTS
 endif()
 
 if(NOT PLATFORM STREQUAL "host" AND NOT BUILD_TESTS)
-    project(my_embedded_project C CXX ASM)
+    project(surgical_instrument_controller C CXX ASM)
 else()
-    project(my_embedded_project C CXX)
+    project(surgical_instrument_controller C CXX)
 endif()
 
 

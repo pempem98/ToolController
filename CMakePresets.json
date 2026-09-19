@@ -7,16 +7,16 @@
     },
     "configurePresets": [
         {
-            "name": "stm32h7",
-            "displayName": "STM32H7A3ZI (Target MCU)",
-            "description": "Cross-compile for STM32H7A3ZI using ARM GNU Toolchain",
+            "name": "stm32h7a3zit6q",
+            "displayName": "STM32H7A3ZIT6Q (NUCLEO-H7A3ZI-Q)",
+            "description": "Cross-compile for STM32H7A3ZIT6Q (NUCLEO-H7A3ZI-Q) using ARM GNU Toolchain",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build",
             "environment": {
                 "ARM_TOOLCHAIN_PATH": "$env{LOCALAPPDATA}/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin"
             },
             "cacheVariables": {
-                "PLATFORM": "stm32h7a3ziq",
+                "PLATFORM": "stm32h7a3zit6q",
                 "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/arm-none-eabi-gcc.cmake",
                 "BUILD_TESTS": "OFF",
                 "ENABLE_COVERAGE": "OFF"
@@ -55,13 +55,13 @@
             }
         },
         {
-            "name": "linux-stm32h7",
-            "displayName": "Linux/Docker: STM32H7 Firmware",
-            "description": "Build STM32H7 firmware in Linux / Docker / WSL",
+            "name": "linux-stm32h7a3zit6q",
+            "displayName": "Linux/Docker: STM32H7A3ZIT6Q Firmware",
+            "description": "Build STM32H7A3ZIT6Q (NUCLEO-H7A3ZI-Q) firmware in Linux / Docker / WSL",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
-                "PLATFORM": "stm32h7a3ziq",
+                "PLATFORM": "stm32h7a3zit6q",
                 "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/arm-none-eabi-gcc.cmake",
                 "BUILD_TESTS": "OFF",
                 "ENABLE_COVERAGE": "OFF"
@@ -82,8 +82,8 @@
     ],
     "buildPresets": [
         {
-            "name": "stm32h7",
-            "configurePreset": "stm32h7"
+            "name": "stm32h7a3zit6q",
+            "configurePreset": "stm32h7a3zit6q"
         },
         {
             "name": "host-tests",
@@ -94,8 +94,8 @@
             "configurePreset": "coverage"
         },
         {
-            "name": "linux-stm32h7",
-            "configurePreset": "linux-stm32h7"
+            "name": "linux-stm32h7a3zit6q",
+            "configurePreset": "linux-stm32h7a3zit6q"
         },
         {
             "name": "linux-coverage",

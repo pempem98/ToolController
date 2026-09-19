@@ -25,10 +25,10 @@ set(TEST_SOURCES
     app/test_system_coordinator.c
     middleware/freertos/test_freertos_osal.c
     # Real drivers under test
-    ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3ziq/drivers/bldc_can_driver.c
-    ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3ziq/drivers/tmc2209_driver.c
-    ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3ziq/drivers/brake_driver.c
-    ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3ziq/drivers/operator_input_driver.c
+    ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3zit6q/drivers/bldc_can_driver.c
+    ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3zit6q/drivers/tmc2209_driver.c
+    ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3zit6q/drivers/brake_driver.c
+    ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3zit6q/drivers/operator_input_driver.c
     # System coordinator
     ${CMAKE_CURRENT_LIST_DIR}/../app/src/system_coordinator.c
 )
@@ -40,7 +40,7 @@ target_include_directories(unit_tests PRIVATE
     stubs
     ../interfaces
     ../platform/common/inc
-    ../platform/stm32h7a3ziq/drivers
+    ../platform/stm32h7a3zit6q/drivers
     ../app/inc
     ../middleware/freertos/inc
     ../services/motor_service/inc
@@ -66,10 +66,19 @@ if(ENABLE_COVERAGE)
     find_program(LCOV_BIN lcov)
     find_program(GENHTML_BIN genhtml)
 
+    # Tìm đúng file gcov tương ứng với trình biên dịch C đang được CMake sử dụng
+    get_filename_component(COMPILER_DIR "${CMAKE_C_COMPILER}" DIRECTORY)
+    find_program(GCOV_BIN gcov HINTS "${COMPILER_DIR}")
+
+    set(GCOVR_GCOV_ARG "")
+    if(GCOV_BIN)
+        set(GCOVR_GCOV_ARG "--gcov-executable" "${GCOV_BIN}")
+    endif()
+
     if(GCOVR_BIN)
         add_custom_target(coverage_report
             COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/coverage_report
-            COMMAND ${GCOVR_BIN} --root ${CMAKE_SOURCE_DIR} --filter services --filter connectivity --filter middleware --filter app --filter platform/stm32h7a3ziq/drivers --exclude tests --exclude build --html --html-details -o ${CMAKE_BINARY_DIR}/coverage_report/index.html
+            COMMAND ${GCOVR_BIN} --root ${CMAKE_SOURCE_DIR} ${GCOVR_GCOV_ARG} --filter services --filter connectivity --filter middleware --filter app --filter platform/stm32h7a3zit6q/drivers --exclude tests --exclude build --html --html-details -o ${CMAKE_BINARY_DIR}/coverage_report/index.html
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMENT "Generating HTML code coverage report in build/coverage_report/index.html..."
         )

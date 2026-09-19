@@ -3,7 +3,7 @@
 
 /**
  * @file app_config.h
- * @brief Các tham số cấu hình toàn cục cấp ứng dụng cho ToolController.
+ * @brief Các tham số cấu hình toàn cục cấp ứng dụng cho Surgical Instrument Controller.
  */
 
 /** @brief Số lượng trục động cơ được quản lý trong hệ thống */

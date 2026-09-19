@@ -1,10 +1,10 @@
 {
-  "name": "ToolController Embedded Dev Container",
+  "name": "Surgical Instrument Controller Dev Container",
   "build": {
     "dockerfile": "../docker/Dockerfile",
     "context": ".."
   },
-  "workspaceFolder": "/workspace/ToolController",
+  "workspaceFolder": "/workspace/surgical-instrument-controller",
   "customizations": {
     "vscode": {
       "settings": {

@@ -1,22 +1,22 @@
 services:
-  toolcontroller-builder:
+  surgical-instrument-builder:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    image: toolcontroller-env:1.0
-    container_name: toolcontroller_build_env
+    image: surgical-instrument-env:1.0
+    container_name: surgical_instrument_build_env
     # Tự động gán quyền sở hữu file theo UID và GID của máy Host (mặc định 1000:1000 cho Linux/WSL)
     user: "${UID:-1000}:${GID:-1000}"
     volumes:
-      - .:/workspace/ToolController
+      - .:/workspace/surgical-instrument-controller
       - ccache-data:/tmp/.ccache
-    working_dir: /workspace/ToolController
+    working_dir: /workspace/surgical-instrument-controller
     environment:
       - HOME=/tmp
       - CCACHE_DIR=/tmp/.ccache
     # Chạy lệnh kiểm tra môi trường nếu không truyền đối số
     command: >
-      bash -c "echo '=== ToolController Build Environment ===' &&
+      bash -c "echo '=== Surgical Instrument Controller Build Environment ===' &&
                gcc --version | head -n 1 &&
                arm-none-eabi-gcc --version | head -n 1 &&
                cmake --version | head -n 1 &&
@@ -26,4 +26,4 @@ services:
 
 volumes:
   ccache-data:
-    name: toolcontroller_ccache_data
+    name: surgical_instrument_ccache_data

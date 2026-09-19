@@ -1,9 +1,9 @@
 ---
 name: codebase-index
-description: Comprehensive memory index and navigational map of all files, directory structures, architectural layers, and toolchain paths in the ToolController project. Activate this skill to immediately locate any file, contract, driver, service, or toolchain binary without scanning the disk or running filesystem searches.
+description: Comprehensive memory index and navigational map of all files, directory structures, architectural layers, and toolchain paths in the Surgical Instrument Controller project. Activate this skill to immediately locate any file, contract, driver, service, or toolchain binary without scanning the disk or running filesystem searches.
 ---
 
-# Codebase Index & Architectural Memory (ToolController)
+# Codebase Index & Architectural Memory (Surgical Instrument Controller)
 
 Tài liệu chỉ mục bộ nhớ chuyên dụng dành riêng cho AI Agent. Mục đích: **Định vị tức thì 100% file mã nguồn, thư viện và toolchain trên máy tính mà không tốn token hay thời gian quét ổ đĩa (Zero Disk Scanning overhead)**.
 
@@ -29,7 +29,7 @@ Mọi công cụ biên dịch, liên kết và kiểm thử trên máy tính c�
 ## 2. Bản Đồ Mã Nguồn Dự Án (100% File Inventory by Architecture Layer)
 
 ### 2.1. Tầng 1: Application Layer (`app/`) - Đã hoàn thiện 100% chuẩn Doxygen
-- [`app/CMakeLists.txt`](app/CMakeLists.txt): Build executable `tool_controller_stm32h7a3ziq.elf`, `.hex`, `.bin`.
+- [`app/CMakeLists.txt`](app/CMakeLists.txt): Build executable `surgical_instrument_controller_stm32h7a3zit6q.elf`, `.hex`, `.bin`.
 - [`app/inc/app_config.h`](app/inc/app_config.h): Cấu hình chu kỳ, timeout và thông số toàn cục hệ thống.
 - [`app/inc/main_app.h`](app/inc/main_app.h) & [`app/src/main_app.c`](app/src/main_app.c): Điểm vào ứng dụng (`App_Init`, `App_Start`, `App_Main`).
 - [`app/inc/system_coordinator.h`](app/inc/system_coordinator.h) & [`app/src/system_coordinator.c`](app/src/system_coordinator.c): Bộ điều phối trung tâm (Dependency Injection, bind driver, quản lý trạng thái, kích hoạt phanh khẩn cấp).
@@ -81,17 +81,17 @@ Mọi công cụ biên dịch, liên kết và kiểm thử trên máy tính c�
 - **Ngoại vi Bus dùng chung nội bộ Platform (`platform/common/inc/`)**:
   - [`platform/common/inc/can_interface.h`](platform/common/inc/can_interface.h): Hợp đồng CAN/CAN-FD bus driver.
   - [`platform/common/inc/uart_interface.h`](platform/common/inc/uart_interface.h): Hợp đồng UART bus driver.
-- **Phần cứng thật STM32H7A3ZIQ (`platform/stm32h7a3ziq/`)**:
-  - [`platform.cmake`](platform/stm32h7a3ziq/platform.cmake): Nạp nguồn HAL, FreeRTOS và Linker Script.
-  - [`board/board.c`](platform/stm32h7a3ziq/board/board.c): Board Support Package / IoHwAb, khởi tạo driver cụ thể và bind vào `board_hardware_t`.
-  - [`drivers/tmc2209_driver.c/.h`](platform/stm32h7a3ziq/drivers/tmc2209_driver.c): Driver động cơ bước UART.
-  - [`drivers/bldc_can_driver.c/.h`](platform/stm32h7a3ziq/drivers/bldc_can_driver.c): Driver động cơ không chổi than CAN.
-  - [`drivers/brake_driver.c/.h`](platform/stm32h7a3ziq/drivers/brake_driver.c): Driver phanh điện từ GPIO.
-  - [`drivers/operator_input_driver.c/.h`](platform/stm32h7a3ziq/drivers/operator_input_driver.c): Driver Joystick ADC DMA & Nút bấm GPIO.
-  - [`mcal/uart_mcal.c/.h`](platform/stm32h7a3ziq/mcal/uart_mcal.c): MCAL ngoại vi UART STM32 HAL & Console adapter.
-  - [`mcal/can_mcal.c/.h`](platform/stm32h7a3ziq/mcal/can_mcal.c): MCAL ngoại vi FDCAN STM32 HAL.
-  - [`cubemx/STM32H7A3xx_FLASH.ld`](platform/stm32h7a3ziq/cubemx/STM32H7A3xx_FLASH.ld): Linker script cho STM32H7A3ZI (Flash 2MB, DTCMRAM 128KB, AXI-SRAM 1MB).
-  - [`cubemx/startup_stm32h7a3xxq.s`](platform/stm32h7a3ziq/cubemx/startup_stm32h7a3xxq.s): Startup code assembly.
+- **Phần cứng thật STM32H7A3ZIT6Q (`platform/stm32h7a3zit6q/`)**:
+  - [`platform.cmake`](platform/stm32h7a3zit6q/platform.cmake): Nạp nguồn HAL, FreeRTOS và Linker Script.
+  - [`board/board.c`](platform/stm32h7a3zit6q/board/board.c): Board Support Package / IoHwAb, khởi tạo driver cụ thể và bind vào `board_hardware_t`.
+  - [`drivers/tmc2209_driver.c/.h`](platform/stm32h7a3zit6q/drivers/tmc2209_driver.c): Driver động cơ bước UART.
+  - [`drivers/bldc_can_driver.c/.h`](platform/stm32h7a3zit6q/drivers/bldc_can_driver.c): Driver động cơ không chổi than CAN.
+  - [`drivers/brake_driver.c/.h`](platform/stm32h7a3zit6q/drivers/brake_driver.c): Driver phanh điện từ GPIO.
+  - [`drivers/operator_input_driver.c/.h`](platform/stm32h7a3zit6q/drivers/operator_input_driver.c): Driver Joystick ADC DMA & Nút bấm GPIO.
+  - [`mcal/uart_mcal.c/.h`](platform/stm32h7a3zit6q/mcal/uart_mcal.c): MCAL ngoại vi UART STM32 HAL & Console adapter.
+  - [`mcal/can_mcal.c/.h`](platform/stm32h7a3zit6q/mcal/can_mcal.c): MCAL ngoại vi FDCAN STM32 HAL.
+  - [`cubemx/STM32H7A3xx_FLASH.ld`](platform/stm32h7a3zit6q/cubemx/STM32H7A3xx_FLASH.ld): Linker script cho STM32H7A3ZIT6Q (Flash 2MB, DTCMRAM 128KB, AXI-SRAM 1MB).
+  - [`cubemx/startup_stm32h7a3xxq.s`](platform/stm32h7a3zit6q/cubemx/startup_stm32h7a3xxq.s): Startup code assembly.
 - **Nền tảng Host SIL mô phỏng (`platform/host/`)**:
   - [`platform.cmake`](platform/host/platform.cmake), `board/board.c`, `drivers/`, `mcal/`.
 
@@ -107,7 +107,7 @@ Mọi công cụ biên dịch, liên kết và kiểm thử trên máy tính c�
 
 ### 2.8. File Cấu Hình Dự Án Cốt Lõi (Root) & Rules
 - [`CMakeLists.txt`](CMakeLists.txt): CMake điều phối toàn dự án.
-- [`CMakePresets.json`](CMakePresets.json): Cấu hình 5 preset thống nhất (Windows: `stm32h7`, `host-tests`, `coverage`; Linux/Docker: `linux-stm32h7`, `linux-coverage`).
+- [`CMakePresets.json`](CMakePresets.json): Cấu hình 5 preset thống nhất (Windows: `stm32h7a3zit6q`, `host-tests`, `coverage`; Linux/Docker: `linux-stm32h7a3zit6q`, `linux-coverage`).
 - [`arm-none-eabi-gcc.cmake`](arm-none-eabi-gcc.cmake): Toolchain file biên dịch chéo ARM GNU.
 - [`docker/Dockerfile`](docker/Dockerfile): Image Docker chuẩn hóa Ubuntu 22.04, ARM GCC 13.3, GCC 12, CMake, Ninja, gcovr.
 - [`docker-compose.yml`](docker-compose.yml): Rút gọn lệnh build container và quản lý volume.
@@ -125,7 +125,7 @@ Mọi công cụ biên dịch, liên kết và kiểm thử trên máy tính c�
 
 Khi cần tìm hoặc sửa một tính năng, luôn tra cứu theo bảng ánh xạ 1-1 sau:
 
-| Nghiệp vụ (Feature) | Domain Service (`services/`) | Abstract Interface (`interfaces/`) | Driver phần cứng (`platform/stm32h7a3ziq/drivers/`) |
+| Nghiệp vụ (Feature) | Domain Service (`services/`) | Abstract Interface (`interfaces/`) | Driver phần cứng (`platform/stm32h7a3zit6q/drivers/`) |
 | :--- | :--- | :--- | :--- |
 | **Động cơ 4 trục** | `motor_service.c/.h` | `motor_interface.h` | `tmc2209_driver.c` (UART), `bldc_can_driver.c` (CAN) |
 | **Phanh cơ khí** | `brake_service.c/.h` | `brake_interface.h` | `brake_driver.c` (GPIO) |

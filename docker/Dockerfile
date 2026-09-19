@@ -26,8 +26,8 @@ RUN wget -q --show-progress --progress=dot:giga \
 # ==============================================================================
 FROM ubuntu:22.04 AS final
 
-LABEL maintainer="ToolController Embedded Team"
-LABEL description="Optimized Reproducible Build & Test Environment for ToolController"
+LABEL maintainer="Surgical Robotics Embedded Team"
+LABEL description="Optimized Reproducible Build & Test Environment for Surgical Instrument Controller"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CCACHE_DIR=/tmp/.ccache
@@ -61,4 +61,4 @@ COPY --from=toolchain-downloader /opt/arm-toolchain /opt/arm-toolchain
 ENV PATH="/opt/arm-toolchain/bin:${PATH}"
 
 # 5. Thư mục làm việc trong container
-WORKDIR /workspace/ToolController
+WORKDIR /workspace/surgical-instrument-controller

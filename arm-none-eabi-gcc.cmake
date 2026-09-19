@@ -59,7 +59,7 @@ endif()
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 # Target specs & flags with Debug Symbols (-O0 -g3)
-if(PLATFORM MATCHES "stm32h7")
+if(PLATFORM MATCHES "stm32h7a3zit6q" OR PLATFORM MATCHES "stm32h7")
     set(CPU_FLAGS "-mcpu=cortex-m7 -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb")
 else()
     set(CPU_FLAGS "-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb")

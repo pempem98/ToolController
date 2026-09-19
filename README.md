@@ -1,6 +1,6 @@
-# ToolController - Hệ Thống Điều Khiển Công Cụ Nhúng 4 Trục (4-Axis Tool Controller)
+# Surgical Instrument Controller - Hệ Thống Điều Khiển Dụng Cụ Phẫu Thuật Robot 4 Trục (4-Axis Surgical Instrument Controller)
 
-Dự án firmware điều khiển công cụ 4 trục công nghiệp hiệu năng cao, xây dựng trên vi điều khiển **STM32H7A3ZIQ (ARM Cortex-M7 @ 280MHz)** kết hợp hệ điều hành thời gian thực **FreeRTOS**. Mã nguồn được thiết kế theo chuẩn **Clean Architecture / Layered Architecture**, bảo đảm tách biệt 100% giữa logic nghiệp vụ và phần cứng vi điều khiển, cho phép kiểm thử Software-in-the-Loop (SIL) toàn diện trên máy tính (Host PC) mà không cần bo mạch thật.
+Dự án firmware điều khiển cụm động cơ dụng cụ phẫu thuật nội soi (Surgical Instrument - tương tự chuẩn EndoWrist của robot da Vinci) hiệu năng cao, xây dựng trên vi điều khiển **STM32H7A3ZIT6Q (Bo mạch NUCLEO-H7A3ZI-Q, ARM Cortex-M7 @ 280MHz, SMPS)** kết hợp hệ điều hành thời gian thực **FreeRTOS**. Mã nguồn được thiết kế theo chuẩn **Clean Architecture / Layered Architecture**, bảo đảm tách biệt 100% giữa logic nghiệp vụ và phần cứng vi điều khiển, cho phép kiểm thử Software-in-the-Loop (SIL) toàn diện trên máy tính (Host PC) mà không cần bo mạch thật.
 
 ---
 
@@ -12,7 +12,7 @@ Hệ thống được phân định ranh giới nghiêm ngặt thành 6 phân t�
 flowchart TD
     subgraph APP_LAYER ["1. Application Layer (app/)"]
         SC["system_coordinator.c/.h<br/>(Dependency Injection & Trạng thái toàn cục)"]
-        RTOS["rtos_tasks.c<br/>(EmergencyBrake, MotionControl, InputScan, Console)"]
+        RTOS["rtos_tasks.c<br/>(emergency_brake_task, motion_control_task, input_scan_task, console_task)"]
         MAIN["main_app.c/.h<br/>(Khởi tạo hệ thống)"]
         SC --> RTOS
     end
@@ -48,7 +48,7 @@ flowchart TD
             UART_IF["uart_interface.h (UART Peripheral Bus)"]
         end
 
-        subgraph STM32_PLAT ["platform/stm32h7a3ziq/ (Hardware Target)"]
+        subgraph STM32_PLAT ["platform/stm32h7a3zit6q/ (Hardware Target)"]
             B_REAL["board/board.c (IoHwAb BSP)"]
             DRV_REAL["drivers/<br/>• tmc2209_driver (UART Stepper)<br/>• bldc_can_driver (CAN BLDC)<br/>• brake_driver (GPIO Phanh)<br/>• operator_input_driver (ADC DMA)"]
             MCAL_REAL["mcal/<br/>• uart_mcal (UART MCAL & Console Adapter)<br/>• can_mcal (FDCAN MCAL)"]
@@ -80,7 +80,7 @@ flowchart TD
 ## 📁 2. Cấu Trúc Thư Mục Dự Án (Project Tree)
 
 ```text
-ToolController/
+surgical-instrument-controller/
 ├── app/                            # Tầng Application Coordinator & FreeRTOS Tasks
 │   ├── inc/                        # app_config.h, main_app.h, rtos_tasks_config.h, system_coordinator.h
 │   ├── src/                        # main_app.c, rtos_tasks.c, system_coordinator.c (Full Doxygen)
@@ -103,23 +103,24 @@ ToolController/
 ├── platform/                       # Tầng hiện thực phần cứng & BSP (Tách biệt hoàn toàn)
 │   ├── common/inc/                 # Hợp đồng bus nội bộ platform: can_interface.h, uart_interface.h
 │   ├── host/                       # Hiện thực giả lập cho PC SIL testing
-│   └── stm32h7a3ziq/               # Nền tảng vi điều khiển STM32H7A3ZIQ
+│   └── stm32h7a3zit6q/             # Nền tảng vi điều khiển STM32H7A3ZIT6Q (NUCLEO-H7A3ZI-Q)
 │       ├── board/board.c           # IoHwAb khởi tạo & liên kết driver phần cứng
 │       ├── drivers/                # tmc2209_driver, bldc_can_driver, brake_driver, operator_input_driver
 │       ├── mcal/                   # uart_mcal, can_mcal
 │       ├── cubemx/                 # Code sinh từ CubeMX (HAL Drivers, FreeRTOS, Linker Script, Startup)
-│       └── platform.cmake          # Script nạp nguồn và cờ liên kết cho STM32H7
+│       └── platform.cmake          # Script nạp nguồn và cờ liên kết cho STM32H7A3ZIT6Q
 ├── services/                       # Tầng Domain Services (Thuần C - 0% phụ thuộc vi điều khiển)
 │   ├── brake_service/              # Nghiệp vụ phanh an toàn & trễ tiếp điểm cơ khí
 │   ├── cli_service/                # Dịch vụ thông dịch dòng lệnh Terminal
 │   ├── motor_service/              # Nghiệp vụ điều khiển 4 trục động cơ, vị trí, vận tốc
 │   └── operator_service/           # Nghiệp vụ người vận hành, lọc deadband 5%
-├── tests/                          # Tầng Unit Tests & Kiểm thử SIL GoogleTest (29 Test Cases)
+├── tests/                          # Tầng Unit Tests & Kiểm thử SIL Unity (65 Test Cases)
 │   ├── app/                        # Test case kiểm tra System Coordinator
 │   ├── middleware/                 # Test case kiểm tra FreeRTOS OSAL
-│   ├── mocks/                      # C++ Mock stubs
+│   ├── drivers/                    # Test cases cho hardware drivers
+│   ├── connectivity/               # Test case cho CLI protocol
 │   ├── services/                   # Test cases cho Motor, Brake, Operator Services
-│   └── CMakeLists.txt              # Fetch GoogleTest & cấu hình gcovr HTML report
+│   └── CMakeLists.txt              # Cấu hình Unity runner & gcovr HTML report
 ├── .agent/                         # Bộ nhớ AI Agent, Rules và Skills chuyên dụng
 │   ├── rules/                      # coding_standards.md, commit_standards.md
 │   └── skills/                     # codebase-index, embedded-toolchain-architect, embedded-tester,...
@@ -162,25 +163,26 @@ Toàn bộ các tác vụ biên dịch đều xuất ra thư mục duy nhất: *
 
 ### Cách 1: Sử dụng phím tắt VS Code (Khuyến nghị)
 Nhấn tổ hợp phím **`Ctrl+Shift+B`** trên bàn phím để chọn tác vụ mong muốn:
-- **`Build Firmware`**: Tự động cấu hình và biên dịch firmware vi điều khiển STM32H7, xuất file `.elf`, `.hex`, `.bin`.
-- **`Rebuild Firmware (Clean & Build)`**: Dọn dẹp và biên dịch lại toàn bộ firmware từ đầu.
-- **`Run Unit Tests`**: Biên dịch và chạy toàn bộ 29 bài kiểm thử GoogleTest SIL trên PC.
-- **`Run Unit Tests with Coverage`**: Chạy unit tests kèm đo độ bao phủ mã nguồn và tự động kết xuất báo cáo HTML trực quan.
-- **`Clean All (Firmware & Tests)`**: Dọn sạch thư mục `build/`.
+- **`1. Build Firmware (STM32H7A3ZIT6Q / NUCLEO-H7A3ZI-Q)`**: Tự động cấu hình và biên dịch firmware vi điều khiển STM32H7A3ZIT6Q, xuất file `.elf`, `.hex`, `.bin`.
+- **`2. Flash Firmware to Board (STM32H7A3ZIT6Q / ST-LINK)`**: Nạp firmware vào bo mạch qua STM32CubeProgrammer CLI.
+- **`3. Rebuild Firmware (Clean & Build)`**: Dọn dẹp và biên dịch lại toàn bộ firmware từ đầu.
+- **`4. Run Unit Tests (Unity SIL)`**: Biên dịch và chạy toàn bộ 65 bài kiểm thử Unity SIL trên PC.
+- **`5. Run Unit Tests with Coverage (HTML Report)`**: Chạy unit tests kèm đo độ bao phủ mã nguồn và tự động kết xuất báo cáo HTML trực quan.
+- **`6. Clean All (Firmware & Tests)`**: Dọn sạch thư mục `build/`.
 
 ### Cách 2: Sử dụng dòng lệnh qua CMake Presets
 
-#### 1. Biên dịch Firmware STM32H7A3ZIQ
+#### 1. Biên dịch Firmware Nạp Bo Mạch STM32H7A3ZIT6Q
 ```powershell
-cmake --fresh --preset stm32h7
-cmake --build --preset stm32h7
+cmake --fresh --preset stm32h7a3zit6q
+cmake --build --preset stm32h7a3zit6q
 ```
-*Kết quả xuất ra tại `build/app/`:*
-- `tool_controller_stm32h7a3ziq.elf` (File nhị phân kèm bảng ký hiệu debug)
-- `tool_controller_stm32h7a3ziq.hex` (File nạp định dạng Intel HEX)
-- `tool_controller_stm32h7a3ziq.bin` (File nhị phân thuần)
+Thành phẩm sinh ra tại thư mục `build/app/`:
+- `surgical_instrument_controller_stm32h7a3zit6q.elf` (File nhị phân kèm bảng ký hiệu debug)
+- `surgical_instrument_controller_stm32h7a3zit6q.hex` (File nạp định dạng Intel HEX)
+- `surgical_instrument_controller_stm32h7a3zit6q.bin` (File nhị phân thuần)
 
-#### 2. Chạy SIL Unit Tests trên PC (GoogleTest)
+#### 2. Chạy SIL Unit Tests trên PC (Unity)
 ```powershell
 cmake --fresh --preset host-tests
 cmake --build --preset host-tests
@@ -204,19 +206,19 @@ Dự án hỗ trợ môi trường Docker đóng băng toàn bộ toolchain (`Ub
 docker compose build
 ```
 
-#### 2. Biên dịch Firmware STM32H7 trong Container
+#### 2. Biên dịch Firmware STM32H7A3ZIT6Q trong Container
 ```bash
-docker compose run --rm toolcontroller-builder sh -c "cmake --preset linux-stm32h7 && cmake --build --preset linux-stm32h7"
+docker compose run --rm surgical-instrument-builder sh -c "cmake --preset linux-stm32h7a3zit6q && cmake --build --preset linux-stm32h7a3zit6q"
 ```
 
 #### 3. Chạy Unit Tests & Xuất Coverage HTML trong Container
 ```bash
-docker compose run --rm toolcontroller-builder sh -c "cmake --preset linux-coverage && cmake --build --preset linux-coverage && ctest --preset linux-coverage && cmake --build --preset linux-coverage --target coverage_report"
+docker compose run --rm surgical-instrument-builder sh -c "cmake --preset linux-coverage && cmake --build --preset linux-coverage && ctest --preset linux-coverage && cmake --build --preset linux-coverage --target coverage_report"
 ```
 
 #### 4. Mở Interactive Shell
 ```bash
-docker compose run --rm toolcontroller-builder bash
+docker compose run --rm surgical-instrument-builder bash
 ```
 
 Hoặc trong VS Code: Nhấn `F1` -> Chọn **"Dev Containers: Reopen in Container"** để lập trình trực tiếp bên trong Docker.
@@ -225,13 +227,20 @@ Hoặc trong VS Code: Nhấn `F1` -> Chọn **"Dev Containers: Reopen in Contain
 
 ## 📊 5. Kết Quả Kiểm Thử & Đo Lường Độ Bao Phủ Mã (Coverage)
 
-### 5.1. Kết Quả Chạy 29 Bài Test SIL
-Tất cả 29 bài kiểm thử độc lập phần cứng đều đạt **100% Passed**:
-- **Operator Service**: 3/3 tests (Khởi tạo, lọc vùng chết deadband 5%, phát hiện nút nhấn phanh).
-- **Motor Service**: 8/8 tests (Khởi tạo, bảo vệ con trỏ NULL, liên kết driver, điều khiển vị trí/vận tốc, đọc encoder, homing & dừng khẩn).
-- **Brake Service**: 8/8 tests (Khởi tạo, an toàn ngắt/nhả phanh, kiểm tra trạng thái tiếp điểm).
-- **FreeRTOS OSAL**: 5/5 tests (Tạo/xóa task, mutex, queue, software timer, hàm thời gian).
-- **System Coordinator**: 5/5 tests (Khởi tạo coordinator, Dependency Injection, truyền thông điệp phanh khẩn cấp).
+### 5.1. Kết Quả Chạy 65 Bài Test SIL
+Tất cả 65 bài kiểm thử độc lập phần cứng đều đạt **100% Passed**:
+- **Hardware Drivers (STM32H7A3ZIT6Q)**: 26 tests
+  - TMC2209 Stepper Driver: 7 tests (Khởi tạo, bật/tắt động cơ, đổi chiều quay, di chuyển vị trí, homing, null guard).
+  - BLDC CAN Driver: 10 tests (Khởi tạo, đóng gói bản tin CAN điều khiển vận tốc/vị trí, giải mã telemetry, lọc ID node).
+  - Brake Driver: 5 tests (Khởi tạo, nhả phanh an toàn, khóa phanh, null guard).
+  - Operator Input Driver: 4 tests (Khởi tạo, tính chuẩn hóa đa trục ADC DMA, nút nhấn phanh, null guard).
+- **Domain Services**: 19 tests
+  - Motor Service: 8 tests (Khởi tạo, quản lý 4 trục, liên kết driver, nội suy vị trí/vận tốc, homing, dừng khẩn cấp).
+  - Brake Service: 8 tests (Khởi tạo, định thời trễ cơ khí 50ms, khóa/nhả an toàn, cảnh báo trạng thái).
+  - Operator Service: 3 tests (Khởi tạo, lọc vùng chết 5%, phát hiện tín hiệu nút bấm phanh).
+- **Connectivity**: 7 tests (Phân tích gói lệnh ASCII, điều khiển throttle, đóng gói bản tin telemetry trạng thái).
+- **Middleware OSAL**: 5 tests (Tạo/hủy tác vụ FreeRTOS, mutex, hàng đợi queue, software timer, hàm thời gian).
+- **Application**: 8 tests (Khởi tạo Coordinator, Dependency Injection, truyền thông điệp phanh khẩn cấp, xử lý ngoại lệ).
 
 ### 5.2. Báo Cáo HTML Trực Quan (`gcovr`)
 Sau khi chạy task coverage, Kỹ sư V có thể mở trực tiếp file báo cáo tại:
@@ -251,7 +260,7 @@ Tính năng báo cáo HTML:
 2. **Quản lý bộ nhớ thời gian thực (Zero Dynamic Allocation)**:
    - Không sử dụng `malloc()` / `free()` trong vòng lặp điều khiển chính (Runtime loop).
    - FreeRTOS tasks, queues và mutexes đều được cấp phát tĩnh hoặc quản lý qua vùng nhớ heap định trước (`heap_4.c` với heap size 32KB).
-   - Phân vùng bộ nhớ STM32H7: Vector ngắt và biến thời gian thực nằm trong `DTCMRAM` (128KB @ `0x20000000`), vùng đệm lớn và DMA nằm trong `AXI-SRAM` (1024KB @ `0x24000000`).
+   - Phân vùng bộ nhớ STM32H7A3ZIT6Q: Vector ngắt và biến thời gian thực nằm trong `DTCMRAM` (128KB @ `0x20000000`), vùng đệm lớn và DMA nằm trong `AXI-SRAM` (1024KB @ `0x24000000`).
 3. **An toàn phần cứng & Clean Architecture**:
    - Nghiệp vụ (`services/`) tuyệt đối không bao hàm header của HAL vi điều khiển.
    - Các bus phần cứng (`CAN`, `UART`) được đóng gói hoàn toàn trong tầng `platform/common/inc/`, chỉ mở ra hợp đồng trừu tượng cho tầng trên.

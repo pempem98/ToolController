@@ -27,8 +27,8 @@ description: >-
    - Implement custom assembly `HardFault_Handler` to extract Main Stack Pointer (`MSP`) or Process Stack Pointer (`PSP`).
    - Read faulting `PC` and locate line of code in `.elf` or `.map` file:
      ```bash
-     arm-none-eabi-addr2line -e build/ToolController.elf -f -C <PC_ADDRESS>
-     arm-none-eabi-gdb build/ToolController.elf -ex "info line *<PC_ADDRESS>" -batch
+     arm-none-eabi-addr2line -e build/app/surgical_instrument_controller_stm32h7a3zit6q.elf -f -C <PC_ADDRESS>
+     arm-none-eabi-gdb build/app/surgical_instrument_controller_stm32h7a3zit6q.elf -ex "info line *<PC_ADDRESS>" -batch
      ```
 2. **Crash Dump & Call Stack Reconstruction**:
    - Inspect Link Register `LR` and stack frame memory backtrace to reconstruct caller execution path.

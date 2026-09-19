@@ -64,7 +64,7 @@ module_status_t module_init(void);
 
 ### 2.3. Nguyên tắc Phân tầng (Layered Architecture Rules)
 - **App** gọi **Services** và **Interfaces**. Không truy cập trực tiếp thanh ghi / platform driver.
-- **Services** chỉ phụ thuộc vào **Interfaces** và **Middleware**. Hoàn toàn độc lập với phần cứng MCU cụ thể (chạy được cả trên Host Simulation `sim` và Hardware `stm32h7`).
+- **Services** chỉ phụ thuộc vào **Interfaces** và **Middleware**. Hoàn toàn độc lập với phần cứng MCU cụ thể (chạy được cả trên Host Simulation `sim` và Hardware `stm32h7a3zit6q`).
 - **Interfaces** thuần C structs chứa con trỏ hàm (Function Pointers) để trừu tượng hóa phần cứng và hỗ trợ Mocking trong Unit Test.
 - **Platform/Drivers** triển khai các con trỏ hàm trong **Interfaces**.
 

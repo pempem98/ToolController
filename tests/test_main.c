@@ -113,7 +113,7 @@ int main(void) {
     UNITY_BEGIN();
 
     printf("\n========================================\n");
-    printf("  1. HARDWARE DRIVERS TESTS (STM32H7)  \n");
+    printf("  1. HARDWARE DRIVERS TESTS (STM32H7A3ZIT6Q)  \n");
     printf("========================================\n");
     s_current_setup = test_bldc_can_driver_setUp;
     s_current_teardown = NULL;

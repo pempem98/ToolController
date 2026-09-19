@@ -5,7 +5,7 @@
 #include "freertos_osal.h"
 
 /**
- * @brief Hàng đợi truyền sự kiện ngắt phanh khẩn cấp từ các Task hoặc ISR tới EmergencyBrakeTask.
+ * @brief Hàng đợi truyền sự kiện ngắt phanh khẩn cấp từ các Task hoặc ISR tới emergency_brake_task.
  */
 static osal_queue_t s_brake_evt_queue = NULL;
 
@@ -13,7 +13,7 @@ static osal_queue_t s_brake_evt_queue = NULL;
  * @brief Gửi thông báo ngắt sự kiện phanh khẩn cấp vào hàng đợi FreeRTOS.
  * 
  * @details Hàm đẩy một byte tín hiệu (event = 1) vào hàng đợi s_brake_evt_queue với timeout = 0
- *          để đánh thức EmergencyBrakeTask ngay lập tức mà không gây block.
+ *          để đánh thức emergency_brake_task ngay lập tức mà không gây block.
  * 
  * @return void
  * @note Hàm được thiết kế an toàn, không gây chặn luồng hiện tại.
@@ -41,7 +41,7 @@ void rtos_notify_brake_event(void) {
  * @return void (Tác vụ RTOS chạy vô hạn).
  * @warning Tác vụ này quyết định tính an toàn cơ khí của hệ thống, không được chèn bất kỳ hàm delay nào.
  */
-void EmergencyBrakeTask(void *pvParameters) {
+void emergency_brake_task(void *pvParameters) {
     (void)pvParameters;
     if (!s_brake_evt_queue) {
         s_brake_evt_queue = osal_queue_create(1, sizeof(uint8_t));
@@ -70,7 +70,7 @@ void EmergencyBrakeTask(void *pvParameters) {
  * @return void
  * @note Hàm này được tách riêng để có thể gọi trực tiếp trong các bài kiểm thử đơn vị (SIL Unit Test).
  */
-void InputScanTaskStep(void) {
+void input_scan_task_step(void) {
     operator_service_update(&g_sys.op_svc);
 
     if (operator_service_is_brake_requested(&g_sys.op_svc)) {
@@ -85,17 +85,17 @@ void InputScanTaskStep(void) {
 /**
  * @brief Tác vụ FreeRTOS quét tín hiệu điều khiển người vận hành (Input Scan Task).
  * 
- * @details Chạy định kỳ theo chu kỳ 10ms (100 Hz). Thực hiện gọi InputScanTaskStep()
+ * @details Chạy định kỳ theo chu kỳ 10ms (100 Hz). Thực hiện gọi input_scan_task_step()
  *          sau đó nhường CPU bằng osal_delay_ms(10).
  * 
  * @param[in] pvParameters Tham số tác vụ (không sử dụng).
  * 
  * @return void (Tác vụ RTOS chạy vô hạn).
  */
-void InputScanTask(void *pvParameters) {
+void input_scan_task(void *pvParameters) {
     (void)pvParameters;
     while (1) {
-        InputScanTaskStep();
+        input_scan_task_step();
         osal_delay_ms(10);
     }
 }
@@ -118,7 +118,7 @@ void InputScanTask(void *pvParameters) {
  * @return void
  * @note Tách hàm phục vụ kiểm thử SIL (Software-in-the-Loop) độc lập.
  */
-void MotionControlTaskStep(void) {
+void motion_control_task_step(void) {
     if (g_sys.emergency_brake_triggered) {
         brake_service_engage(&g_sys.brake_svc);
         motor_service_stop_all(&g_sys.motor_svc);
@@ -157,10 +157,10 @@ void MotionControlTaskStep(void) {
  * 
  * @return void (Tác vụ RTOS chạy vô hạn).
  */
-void MotionControlTask(void *pvParameters) {
+void motion_control_task(void *pvParameters) {
     (void)pvParameters;
     while (1) {
-        MotionControlTaskStep();
+        motion_control_task_step();
         osal_delay_ms(10);
     }
 }
@@ -177,7 +177,7 @@ void MotionControlTask(void *pvParameters) {
  * 
  * @return void
  */
-void ConsoleTaskStep(void) {
+void console_task_step(void) {
     uint32_t tick = osal_get_tick_ms();
     cli_service_process(&g_sys.cli_svc, tick);
 }
@@ -192,10 +192,10 @@ void ConsoleTaskStep(void) {
  * 
  * @return void (Tác vụ RTOS chạy vô hạn).
  */
-void ConsoleTask(void *pvParameters) {
+void console_task(void *pvParameters) {
     (void)pvParameters;
     while (1) {
-        ConsoleTaskStep();
+        console_task_step();
         osal_delay_ms(50);
     }
 }

@@ -1,5 +1,5 @@
 # ==============================================================================
-# Docker Ignore Configuration for ToolController
+# Docker Ignore Configuration for Surgical Instrument Controller
 # Loại trừ các file build, git, và tài nguyên nặng để tối ưu build context (< 5MB)
 # ==============================================================================
 
@@ -41,3 +41,4 @@ coverage_report/
 *.gcov
 coverage.info
 test_results.log
+

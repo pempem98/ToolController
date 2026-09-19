@@ -1,4 +1,4 @@
-# STM32H7A3ZIQ Platform Build Specification
+# STM32H7A3ZIT6Q Platform Build Specification
 
 set(PLATFORM_DEFINES
     USE_PWR_DIRECT_SMPS_SUPPLY

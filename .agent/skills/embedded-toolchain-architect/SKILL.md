@@ -119,13 +119,13 @@ description: >-
 
 ### G. Xung Đột Cache Khi Dùng Chung Duy Nhất Một Thư Mục `build/` & Giải Pháp `--fresh`
 
-- **Hiện tượng**: Khi tất cả presets (`stm32h7`, `host-tests`, `coverage`) cùng xuất ra `${sourceDir}/build`:
+- **Hiện tượng**: Khi tất cả presets (`stm32h7a3zit6q`, `host-tests`, `coverage`) cùng xuất ra `${sourceDir}/build`:
   - Chạy `coverage` ghi `ENABLE_COVERAGE=ON` vào `build/CMakeCache.txt`.
-  - Chuyển sang `stm32h7` mà không làm sạch cache sẽ khiến cờ `--coverage` bị tiêm vào trình biên dịch `arm-none-eabi-gcc`.
+  - Chuyển sang `stm32h7a3zit6q` mà không làm sạch cache sẽ khiến cờ `--coverage` bị tiêm vào trình biên dịch `arm-none-eabi-gcc`.
   - Bảng gcov làm phình to `.bss` thêm 125 KB, gây tràn phân vùng `DTCMRAM` đúng 33,560 bytes.
 - **Biện pháp phòng vệ 3 lớp bắt buộc**:
   1. *Guard trong `CMakeLists.txt`*: `if(ENABLE_COVERAGE AND (PLATFORM STREQUAL "host" OR BUILD_TESTS))` để cấm tuyệt đối `--coverage` trên MCU.
-  2. *Ép biến trong Preset*: Đặt `"ENABLE_COVERAGE": "OFF"` tường minh cho preset `stm32h7`.
+  2. *Ép biến trong Preset*: Đặt `"ENABLE_COVERAGE": "OFF"` tường minh cho preset `stm32h7a3zit6q`.
   3. *Tự động xóa cache bằng `--fresh`*: Luôn dùng `cmake --fresh --preset <preset_name>` trong tasks để tái tạo cấu hình sạch sẽ khi đổi kiến trúc.
 
 ### H. Môi Trường Kiểm Thử Native & Báo Cáo Coverage HTML (`gcovr`)
@@ -209,7 +209,7 @@ winget install -e --id BrechtSanders.WinLibs.POSIX.UCRT
         }
     },
     "tasks": [
-        { "label": "Build Firmware", "command": "cmake --preset stm32h7 && cmake --build --preset stm32h7" },
+        { "label": "Build Firmware", "command": "cmake --preset stm32h7a3zit6q && cmake --build --preset stm32h7a3zit6q" },
         { "label": "Run Unit Tests", "command": "cmake --preset host-tests && cmake --build --preset host-tests && ctest --preset host-tests" },
         { "label": "Run Tests with Coverage", "command": "cmake --preset coverage && cmake --build --preset coverage && ctest --preset coverage" },
         { "label": "Clean All", "command": "cmake -E rm -rf build build_tests build_coverage" }

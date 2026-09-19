@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.20)
 
 if(NOT DEFINED PLATFORM OR PLATFORM MATCHES "^\\$\\{" OR PLATFORM STREQUAL "")
-    set(PLATFORM "stm32h7a3ziq")
+    set(PLATFORM "stm32h7a3zit6q")
 endif()
 
 if(NOT EXISTS "${CMAKE_CURRENT_LIST_DIR}/../platform/${PLATFORM}/platform.cmake")
-    set(PLATFORM "stm32h7a3ziq")
+    set(PLATFORM "stm32h7a3zit6q")
 endif()
 
 
@@ -13,7 +13,7 @@ endif()
 include("${CMAKE_CURRENT_LIST_DIR}/../platform/${PLATFORM}/platform.cmake")
 
 
-set(APP_NAME "tool_controller_${PLATFORM}")
+set(APP_NAME "surgical_instrument_controller_${PLATFORM}")
 
 add_executable(${APP_NAME}
     src/main_app.c

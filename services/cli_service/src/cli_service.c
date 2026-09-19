@@ -25,7 +25,7 @@ bool cli_service_init(cli_service_t *svc,
 
     memset(svc->rx_buffer, 0, sizeof(svc->rx_buffer));
 
-    console_send_str(console, "\r\n=== ToolController Multi-Motor CLI Service Initialized ===\r\n");
+    console_send_str(console, "\r\n=== Surgical Instrument Controller Multi-Motor CLI Service Initialized ===\r\n");
     console_send_str(console, "Type 'help' for command list.\r\n> ");
     return true;
 }

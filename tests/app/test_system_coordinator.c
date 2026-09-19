@@ -3,10 +3,10 @@
 #include "board_interface.h"
 #include <string.h>
 
-void EmergencyBrakeTask(void *pvParameters) { (void)pvParameters; }
-void MotionControlTask(void *pvParameters) { (void)pvParameters; }
-void InputScanTask(void *pvParameters) { (void)pvParameters; }
-void ConsoleTask(void *pvParameters) { (void)pvParameters; }
+void emergency_brake_task(void *pvParameters) { (void)pvParameters; }
+void motion_control_task(void *pvParameters) { (void)pvParameters; }
+void input_scan_task(void *pvParameters) { (void)pvParameters; }
+void console_task(void *pvParameters) { (void)pvParameters; }
 void rtos_notify_brake_event(void) {}
 status_t board_init(void) { return STATUS_OK; }
 const board_hardware_t* board_get_hardware(void) { return NULL; }

@@ -18,43 +18,45 @@ Mọi commit bắt buộc tuân theo định dạng:
 | Type | Mục đích | Ví dụ |
 | :--- | :--- | :--- |
 | **`feat`** | Tính năng mới cho firmware, driver hoặc service | `feat(canopen): add support for PDO asynchronous transmission` |
-| **`fix`** | Sửa lỗi bug, crash, memory leak, race condition | `fix(stm32h7): resolve DMA D-Cache coherency issue in UART RX` |
-| **`refactor`** | Tái cấu trúc code mà không thay đổi hành vi logic | `refactor(motion_service): modularize PID computation logic` |
-| **`perf`** | Tối ưu hóa hiệu năng, giảm thời gian thực thi ISR/WCET | `perf(dsp): optimize vector multiplication using CMSIS-DSP SIMD` |
-| **`test`** | Thêm mới hoặc cập nhật Unit Test, Mock, HIL/SIL tests | `test(io_service): add boundary test cases for analog input channels` |
-| **`docs`** | Cập nhật tài liệu kỹ thuật, Doxygen, README, Architecture specs | `docs(ethercat): document state transition diagram and timing constraints` |
-| **`chore`** | Các tác vụ phụ trợ, quản lý build, cập nhật cấu hình | `chore(cmake): update ARM GCC compiler optimization flags to -O2` |
-| **`ci`** | Cập nhật workflow CI/CD, kịch bản test tự động | `ci(github-actions): add automated gcov code coverage check step` |
+| **`fix`** | Sửa lỗi bug, crash, memory leak, race condition | `fix(stm32h7a3zit6q): resolve DMA D-Cache coherency issue in UART RX` |
+| **`docs`** | Thêm / cập nhật tài liệu, comment Doxygen, README | `docs(readme): add wiring diagram for TMC2209 stepper driver` |
+| **`style`** | Định dạng code (whitespace, format, missing semi-colons) | `style(services): apply clang-format rules to motor_service` |
+| **`refactor`** | Tái cấu trúc code (không sửa bug, không thêm tính năng) | `refactor(interfaces): split monolithic bus interface into CAN and UART` |
+| **`test`** | Thêm / sửa unit tests, mock, SIL tests | `test(brake_service): add test cases for emergency brake timeout` |
+| **`chore`** | Cập nhật cấu hình build, toolchain, gitignore, CI/CD | `chore(cmake): bump minimum required version to 3.22` |
+| **`perf`** | Tối ưu hóa hiệu năng, giảm chu kỳ CPU, tiết kiệm RAM | `perf(math): replace floating-point trigonometry with LUT` |
+| **`ci`** | Cập nhật GitHub Actions, pipeline CI | `ci(github): add workflow for automated host unit testing` |
 
 ---
 
-## 3. Quy chuẩn Scope cho Dự án Embedded
-
-Scope phải thể hiện rõ phân tầng kiến trúc hoặc module phần cứng bị ảnh hưởng:
-- **Platform / Drivers**: `(stm32h7)`, `(sim)`, `(gpio)`, `(can)`, `(uart)`, `(timer)`, `(dma)`
-- **Interfaces**: `(interfaces/gpio)`, `(interfaces/can)`, `(interfaces/wdt)`
-- **Middleware**: `(freertos)`, `(canopen)`, `(ethercat)`
-- **Services**: `(motion_service)`, `(health_monitor)`, `(fieldbus_service)`, `(io_service)`
-- **App**: `(coordinator)`, `(app_config)`, `(tasks)`
+## 3. Quy Tắc Scope (Phạm Vi Thay Đổi)
+Scope phải chỉ rõ module hoặc subsystem bị ảnh hưởng:
+- **Application**: `(app)`, `(main)`, `(state_machine)`, `(coordinator)`
+- **Domain Services**: `(motor_service)`, `(brake_service)`, `(operator_service)`, `(cli_service)`
+- **Interfaces**: `(interfaces)`, `(motor_if)`, `(brake_if)`, `(sensor_if)`
+- **Connectivity**: `(cli)`, `(canopen)`, `(modbus)`
+- **Middleware**: `(freertos)`, `(osal)`, `(queue)`, `(mutex)`
+- **Platform / Drivers**: `(stm32h7a3zit6q)`, `(sim)`, `(gpio)`, `(can)`, `(uart)`, `(timer)`, `(dma)`
+- **Toolchain / Build**: `(cmake)`, `(presets)`, `(toolchain)`, `(linker)`, `(vscode)`
+- **Testing**: `(unity)`, `(sil)`, `(mocks)`, `(coverage)`
 
 ---
 
-## 4. Ví dụ Commit Chuẩn Mực
+## 4. Quy Tắc Viết Subject (Tiêu Đề Commit)
+1. **Dùng thể mệnh lệnh, thì hiện tại** (Imperative mood): *"add"*, *"fix"*, *"refactor"*, *"update"*, KHÔNG dùng *"added"*, *"fixes"*, *"refactored"*.
+2. **Không viết hoa chữ cái đầu** của subject (trừ tên riêng như `FreeRTOS`, `DMA`).
+3. **Không có dấu chấm `.` ở cuối câu**.
+4. **Độ dài tối đa 72 ký tự** cho dòng đầu tiên.
+5. **Ngôn ngữ**: Khuyến khích viết bằng **tiếng Anh kỹ thuật** chuẩn mực.
 
-### Ví dụ 1: Sửa lỗi ngoại lệ DMA Cache
+---
+
+## 5. Ví Dụ Commit Chuẩn Mẫu
+
 ```text
-fix(stm32h7/dma): invalidate D-Cache before processing UART RX buffer
-
-The Cortex-M7 core was reading stale data from D-Cache instead of
-newly arrived bytes written by DMA in AXI SRAM. 
-Added SCB_InvalidateDCache_by_Addr() call right before triggering RX callback.
+feat(motor_service): implement S-curve acceleration profile for BLDC motors
 ```
 
-### Ví dụ 2: Thêm tính năng Service
 ```text
-feat(motion_service): integrate S-curve profile trajectory planner
-
-Implement jerk-limited 7-segment motion trajectory algorithm.
-Reduces mechanical vibration during high-speed positioning.
+fix(stm32h7a3zit6q/dma): invalidate D-Cache before processing UART RX buffer
 ```
-

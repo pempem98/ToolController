@@ -4,10 +4,10 @@
 #include <stddef.h>
 
 // Forward declarations cho các RTOS task entries
-extern void EmergencyBrakeTask(void *pvParameters);
-extern void MotionControlTask(void *pvParameters);
-extern void InputScanTask(void *pvParameters);
-extern void ConsoleTask(void *pvParameters);
+extern void emergency_brake_task(void *pvParameters);
+extern void motion_control_task(void *pvParameters);
+extern void input_scan_task(void *pvParameters);
+extern void console_task(void *pvParameters);
 extern void rtos_notify_brake_event(void);
 
 /**
@@ -68,18 +68,18 @@ bool system_coordinator_init(system_coordinator_t *sys, const board_hardware_t *
  * @return false Lỗi khi tạo một trong các task.
  * 
  * @note 4 tác vụ được khởi tạo theo phân tầng ưu tiên:
- *       1. EmgBrakeTask (Priority: Realtime/High, xử lý ngắt phanh khẩn cấp < 1ms)
- *       2. MotionTask (Priority: High, chu kỳ 10ms đồng bộ 4 trục)
- *       3. InputScanTask (Priority: Normal, chu kỳ 10ms quét chiết áp & nút bấm)
- *       4. ConsoleTask (Priority: Low, chu kỳ 50ms phục vụ UART CLI & Telemetry)
+ *       1. emergency_brake_task (Priority: Realtime/High, xử lý ngắt phanh khẩn cấp < 1ms)
+ *       2. motion_control_task (Priority: High, chu kỳ 10ms đồng bộ 4 trục)
+ *       3. input_scan_task (Priority: Normal, chu kỳ 10ms quét chiết áp & nút bấm)
+ *       4. console_task (Priority: Low, chu kỳ 50ms phục vụ UART CLI & Telemetry)
  */
 bool system_coordinator_start_tasks(system_coordinator_t *sys) {
     (void)sys;
     // Khởi tạo các tasks trong FreeRTOS với độ ưu tiên phân tầng
-    osal_task_create("EmgBrakeTask", EmergencyBrakeTask, NULL, EMERGENCY_BRAKE_TASK_STACK_SIZE, EMERGENCY_BRAKE_TASK_PRIORITY);
-    osal_task_create("MotionTask",   MotionControlTask,  NULL, MOTION_CONTROL_TASK_STACK_SIZE,  MOTION_CONTROL_TASK_PRIORITY);
-    osal_task_create("InputScanTask",InputScanTask,      NULL, INPUT_SCAN_TASK_STACK_SIZE,      INPUT_SCAN_TASK_PRIORITY);
-    osal_task_create("ConsoleTask",  ConsoleTask,        NULL, CONSOLE_TASK_STACK_SIZE,         CONSOLE_TASK_PRIORITY);
+    osal_task_create("EmgBrakeTask", emergency_brake_task, NULL, EMERGENCY_BRAKE_TASK_STACK_SIZE, EMERGENCY_BRAKE_TASK_PRIORITY);
+    osal_task_create("MotionTask",   motion_control_task,  NULL, MOTION_CONTROL_TASK_STACK_SIZE,  MOTION_CONTROL_TASK_PRIORITY);
+    osal_task_create("InputScanTask",input_scan_task,      NULL, INPUT_SCAN_TASK_STACK_SIZE,      INPUT_SCAN_TASK_PRIORITY);
+    osal_task_create("ConsoleTask",  console_task,        NULL, CONSOLE_TASK_STACK_SIZE,         CONSOLE_TASK_PRIORITY);
     return true;
 }
 
@@ -92,7 +92,7 @@ bool system_coordinator_start_tasks(system_coordinator_t *sys) {
  * 
  * @note Hàm này an toàn để gọi từ cả ngữ cảnh Task lẫn ISR (thông qua FreeRTOS queue/event).
  * @warning Ngay khi hàm này được gọi, cờ emergency_brake_triggered sẽ được bật và
- *          EmergencyBrakeTask sẽ lập tức khóa phanh cơ khí và ra lệnh dừng khẩn cấp toàn bộ động cơ.
+ *          emergency_brake_task sẽ lập tức khóa phanh cơ khí và ra lệnh dừng khẩn cấp toàn bộ động cơ.
  */
 void system_coordinator_trigger_emergency_brake(system_coordinator_t *sys) {
     if (!sys) return;

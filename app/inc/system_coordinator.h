@@ -16,7 +16,7 @@ extern "C" {
 #define MAX_MOTOR_SPEED_RPM 1000
 
 /**
- * @brief Cấu trúc dữ liệu chính của bộ điều phối toàn hệ thống ToolController.
+ * @brief Cấu trúc dữ liệu chính của bộ điều phối toàn hệ thống Surgical Instrument Controller.
  * 
  * @details Tập hợp toàn bộ các service nghiệp vụ, mảng đối tượng động cơ,
  *          và cờ trạng thái ngắt an toàn khẩn cấp.

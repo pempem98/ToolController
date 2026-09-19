@@ -33,7 +33,7 @@ description: >-
      `gcovr --root . --filter services --filter connectivity --filter middleware --filter app --exclude tests --exclude build --html --html-details -o build/coverage_report/index.html`
    - Báo cáo HTML trực quan hỗ trợ drill-down từng dòng code, tỷ lệ Line / Function / Branch coverage.
 
-## ToolController Test Architecture (29 Tests - 100% Passed)
+## Surgical Instrument Controller Test Architecture (65 Tests - 100% Passed)
 - **Operator Service Tests** (`test_operator_service.cpp`): Deadband 5% filtering, joystick threshold, brake button.
 - **Motor Service Tests** (`test_motor_service.cpp`): NULL guards, bind driver, multi-axis enable/disable, move_to, rotate, actual position & encoder feedback, homing and stop.
 - **Brake Service Tests** (`test_brake_service.cpp`): Mechanical contact timing, state transitions, fail-safe NULL guards.
