@@ -6,38 +6,52 @@ on:
   pull_request:
     branches: [ main, master, develop ]
 
+permissions:
+  contents: read
+
 jobs:
-  build-and-test:
+  # ============================================================================
+  # 1. BIÊN DỊCH FIRMWARE STM32H7 (XUẤT FILE HEX, BIN, ELF)
+  # ============================================================================
+  build-firmware:
+    name: 🛠️ Build Firmware (STM32H7)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: Install ARM GNU Toolchain
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             gcc-arm-none-eabi \
+            binutils-arm-none-eabi \
             libnewlib-arm-none-eabi \
             cmake \
-            ninja-build \
-            gcc \
-            python3 \
-            python3-pip
-          pip3 install --no-cache-dir gcovr
+            ninja-build
 
       - name: Cross-Compile STM32H7 Firmware (output to build/)
         run: |
           cmake --preset linux-stm32h7
           cmake --build --preset linux-stm32h7
 
-      - name: Build & Run Unity Unit Tests with Coverage (output to build/)
+      - name: Generate Firmware Memory Summary
         run: |
-          cmake --preset linux-coverage
-          cmake --build --preset linux-coverage
-          ctest --preset linux-coverage
-          cmake --build --preset linux-coverage --target coverage_report
+          echo "### 🛠️ STM32H7 Firmware Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| File Type | File Name | Size (Bytes) |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          ELF_SIZE=$(stat -c%s "build/app/tool_controller_stm32h7a3ziq.elf" 2>/dev/null || echo "N/A")
+          HEX_SIZE=$(stat -c%s "build/app/tool_controller_stm32h7a3ziq.hex" 2>/dev/null || echo "N/A")
+          BIN_SIZE=$(stat -c%s "build/app/tool_controller_stm32h7a3ziq.bin" 2>/dev/null || echo "N/A")
+          echo "| **ELF** | \`tool_controller_stm32h7a3ziq.elf\` | $ELF_SIZE |" >> $GITHUB_STEP_SUMMARY
+          echo "| **HEX** | \`tool_controller_stm32h7a3ziq.hex\` | $HEX_SIZE |" >> $GITHUB_STEP_SUMMARY
+          echo "| **BIN** | \`tool_controller_stm32h7a3ziq.bin\` | $BIN_SIZE |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "#### Memory Section Details (arm-none-eabi-size)" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          arm-none-eabi-size build/app/tool_controller_stm32h7a3ziq.elf >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Firmware Artifacts (.hex, .bin, .elf)
         uses: actions/upload-artifact@v4
@@ -47,9 +61,80 @@ jobs:
             build/app/*.hex
             build/app/*.bin
             build/app/*.elf
+          if-no-files-found: error
 
-      - name: Upload Coverage HTML Report
+  # ============================================================================
+  # 2. KIỂM THỬ TỰ ĐỘNG UNITY VÀ ĐO ĐỘ BAO PHỦ MÃ NGUỒN (COVERAGE)
+  # ============================================================================
+  unit-tests-and-coverage:
+    name: 🧪 Unit Tests & Code Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Host Compiler, Python & gcovr
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc \
+            g++ \
+            cmake \
+            ninja-build \
+            python3 \
+            python3-pip
+          pip3 install --no-cache-dir gcovr
+
+      - name: Build Unity Unit Tests with Coverage Flags
+        run: |
+          cmake --preset linux-coverage
+          cmake --build --preset linux-coverage
+
+      - name: Run Unit Tests & Collect Output
+        id: run_tests
+        run: |
+          ./build/tests/unit_tests > test_results.log 2>&1 || (cat test_results.log && exit 1)
+          cat test_results.log
+
+      - name: Generate HTML Coverage Report
+        run: |
+          cmake --build --preset linux-coverage --target coverage_report
+
+      - name: Publish Test Results & Coverage Report to Step Summary
+        if: always()
+        run: |
+          echo "### 🧪 Unity Unit Test Results" >> $GITHUB_STEP_SUMMARY
+          if [ -f test_results.log ]; then
+            TOTAL_TESTS=$(grep -oE "[0-9]+ Tests" test_results.log | head -1 | awk '{print $1}')
+            FAILURES=$(grep -oE "[0-9]+ Failures" test_results.log | head -1 | awk '{print $1}')
+            IGNORED=$(grep -oE "[0-9]+ Ignored" test_results.log | head -1 | awk '{print $1}')
+            PASSED=$((TOTAL_TESTS - FAILURES - IGNORED))
+
+            echo "| Test Status | Total Tests | Passed | Failures | Ignored |" >> $GITHUB_STEP_SUMMARY
+            echo "| :---: | :---: | :---: | :---: | :---: |" >> $GITHUB_STEP_SUMMARY
+            if [ "$FAILURES" -eq 0 ]; then
+              echo "| 🟢 **PASSED** | $TOTAL_TESTS | $PASSED | $FAILURES | $IGNORED |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| 🔴 **FAILED** | $TOTAL_TESTS | $PASSED | $FAILURES | $IGNORED |" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### 📊 Code Coverage Summary (gcovr)" >> $GITHUB_STEP_SUMMARY
+          python3 -m gcovr --root . \
+            --filter services \
+            --filter connectivity \
+            --filter middleware \
+            --filter app \
+            --filter platform/stm32h7a3ziq/drivers \
+            --exclude tests \
+            --exclude build \
+            --markdown >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload HTML Coverage Report Artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report-html
           path: build/coverage_report/
+          if-no-files-found: error
