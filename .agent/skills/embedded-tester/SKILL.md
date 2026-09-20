@@ -33,6 +33,11 @@ description: >-
      `gcovr --root . --filter services --filter connectivity --filter middleware --filter app --exclude tests --exclude build --html --html-details -o build/coverage_report/index.html`
    - Báo cáo HTML trực quan hỗ trợ drill-down từng dòng code, tỷ lệ Line / Function / Branch coverage.
 
+## Gap Đã Biết (Known Gaps — Cập Nhật 2026-09-20)
+- **`app/src/rtos_tasks.c` không có test thực**: `tests/test_main.c` định nghĩa `emergency_brake_task`, `motion_control_task`, `input_scan_task` thành stub rỗng để thoả linker. Toàn bộ logic task thực (bao gồm đường xử lý dừng khẩn cấp) KHÔNG nằm trong 65 test case. Con số "65/65 Passed" không phản ánh coverage của chính task orchestration layer. Ưu tiên P0: viết test gọi trực tiếp `emergency_brake_task`/`motion_control_task_step`/`input_scan_task_step`.
+- **Không có static analysis / MISRA check tự động trong CI**: `coding_standards.md` yêu cầu tuân thủ MISRA-C nhưng không có `cppcheck`/`clang-tidy` chạy trong `.github/workflows/ci.yml`. Khi thêm, chạy như 1 job riêng song song với `unit-tests-and-coverage`, không chặn build nếu chưa baseline được false-positive.
+- **Chưa có test cho race condition / staleness của input an toàn**: xem `.agent/rules/orchestration_protocol.md` — Verifier phải tự thêm test khi review bất kỳ thay đổi nào chạm `emergency_brake_triggered`, ADC operator input, hoặc brake path.
+
 ## Surgical Instrument Controller Test Architecture (65 Tests - 100% Passed)
 - **Operator Service Tests** (`test_operator_service.cpp`): Deadband 5% filtering, joystick threshold, brake button.
 - **Motor Service Tests** (`test_motor_service.cpp`): NULL guards, bind driver, multi-axis enable/disable, move_to, rotate, actual position & encoder feedback, homing and stop.

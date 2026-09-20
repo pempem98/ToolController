@@ -137,4 +137,185 @@ void test_motor_service_home_and_stop(void) {
     TEST_ASSERT_TRUE(motor_service_stop_all(&s_svc));
 }
 
+/* ---------------------------------------------------------------------
+ * Additional coverage: NULL-function fallbacks, propagation of driver
+ * failures across *_all helpers, and update() skip paths.
+ * ------------------------------------------------------------------- */
 
+/* A second mock driver with every function pointer left NULL, used to
+ * exercise the fallback branches (driver present but specific fn NULL). */
+static motor_interface_t s_null_fn_driver;
+
+/* An error-returning driver used to test failure propagation in the
+ * *_all() aggregate helpers. */
+static status_t mock_rotate_fail(motor_interface_t *self, motor_direction_t dir, uint32_t spd) {
+    (void)self; (void)dir; (void)spd; return STATUS_ERROR;
+}
+static status_t mock_move_to_fail(motor_interface_t *self, int32_t pos, uint32_t spd, motor_direction_t dir) {
+    (void)self; (void)pos; (void)spd; (void)dir; return STATUS_ERROR;
+}
+static status_t mock_stop_fail(motor_interface_t *self) {
+    (void)self; return STATUS_ERROR;
+}
+static motor_interface_t s_fail_driver;
+
+void test_motor_service_set_direction_with_null_driver_function(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    memset(&s_null_fn_driver, 0, sizeof(s_null_fn_driver));
+    motor_service_bind_driver(&s_svc, 0, &s_null_fn_driver);
+
+    TEST_ASSERT_TRUE(motor_service_set_direction(&s_svc, 0, MOTOR_DIR_CCW));
+    TEST_ASSERT_EQUAL(MOTOR_DIR_CCW, s_svc.motors[0].direction);
+}
+
+static status_t mock_set_direction_fail(motor_interface_t *self, motor_direction_t dir) {
+    (void)self; (void)dir; return STATUS_ERROR;
+}
+
+void test_motor_service_set_direction_propagates_driver_failure(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    memset(&s_fail_driver, 0, sizeof(s_fail_driver));
+    s_fail_driver.set_direction = mock_set_direction_fail;
+    motor_service_bind_driver(&s_svc, 0, &s_fail_driver);
+
+    TEST_ASSERT_FALSE(motor_service_set_direction(&s_svc, 0, MOTOR_DIR_CCW));
+    /* direction trong struct van duoc cap nhat truoc khi goi driver (theo code), */
+    /* chi gia tri tra ve phan anh loi tu driver. */
+    TEST_ASSERT_EQUAL(MOTOR_DIR_CCW, s_svc.motors[0].direction);
+}
+
+void test_motor_service_get_position_fallback_when_driver_null(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    s_svc.motors[0].actual_position = 4242;
+
+    int32_t pos = 0;
+    TEST_ASSERT_TRUE(motor_service_get_actual_position(&s_svc, 0, &pos));
+    TEST_ASSERT_EQUAL_INT32(4242, pos);
+}
+
+void test_motor_service_get_position_fallback_when_getter_null(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    memset(&s_null_fn_driver, 0, sizeof(s_null_fn_driver));
+    motor_service_bind_driver(&s_svc, 0, &s_null_fn_driver);
+    s_svc.motors[0].actual_position = 777;
+
+    int32_t pos = 0;
+    TEST_ASSERT_TRUE(motor_service_get_actual_position(&s_svc, 0, &pos));
+    TEST_ASSERT_EQUAL_INT32(777, pos);
+}
+
+void test_motor_service_get_encoder_fallback_when_driver_null_and_getter_null(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    s_svc.motors[0].encoder_ticks = 555;
+
+    int32_t ticks = 0;
+    TEST_ASSERT_TRUE(motor_service_get_encoder(&s_svc, 0, &ticks));
+    TEST_ASSERT_EQUAL_INT32(555, ticks);
+
+    memset(&s_null_fn_driver, 0, sizeof(s_null_fn_driver));
+    motor_service_bind_driver(&s_svc, 1, &s_null_fn_driver);
+    s_svc.motors[1].encoder_ticks = 888;
+
+    ticks = 0;
+    TEST_ASSERT_TRUE(motor_service_get_encoder(&s_svc, 1, &ticks));
+    TEST_ASSERT_EQUAL_INT32(888, ticks);
+}
+
+void test_motor_service_home_with_null_driver_and_null_home_fn(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+
+    /* driver == NULL */
+    TEST_ASSERT_TRUE(motor_service_home(&s_svc, 0));
+
+    /* driver present but home() is NULL */
+    memset(&s_null_fn_driver, 0, sizeof(s_null_fn_driver));
+    motor_service_bind_driver(&s_svc, 1, &s_null_fn_driver);
+    TEST_ASSERT_TRUE(motor_service_home(&s_svc, 1));
+}
+
+void test_motor_service_rotate_all_null_guards(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    motor_direction_t dirs[4] = { MOTOR_DIR_CW, MOTOR_DIR_CW, MOTOR_DIR_CW, MOTOR_DIR_CW };
+    uint32_t speeds[4] = { 100, 100, 100, 100 };
+
+    TEST_ASSERT_FALSE(motor_service_rotate_all(&s_svc, NULL, speeds));
+    TEST_ASSERT_FALSE(motor_service_rotate_all(&s_svc, dirs, NULL));
+    TEST_ASSERT_FALSE(motor_service_rotate_all(NULL, dirs, speeds));
+}
+
+void test_motor_service_move_all_null_guards(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    int32_t positions[4] = { 1, 2, 3, 4 };
+    uint32_t speeds[4] = { 100, 100, 100, 100 };
+    motor_direction_t dirs[4] = { MOTOR_DIR_CW, MOTOR_DIR_CW, MOTOR_DIR_CW, MOTOR_DIR_CW };
+
+    TEST_ASSERT_FALSE(motor_service_move_all(&s_svc, NULL, speeds, dirs));
+    TEST_ASSERT_FALSE(motor_service_move_all(&s_svc, positions, NULL, dirs));
+    TEST_ASSERT_FALSE(motor_service_move_all(&s_svc, positions, speeds, NULL));
+    TEST_ASSERT_FALSE(motor_service_move_all(NULL, positions, speeds, dirs));
+}
+
+void test_motor_service_rotate_all_propagates_failure(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    motor_service_bind_driver(&s_svc, 0, &s_mock_driver);
+
+    memset(&s_fail_driver, 0, sizeof(s_fail_driver));
+    s_fail_driver.rotate = mock_rotate_fail;
+    motor_service_bind_driver(&s_svc, 1, &s_fail_driver);
+
+    motor_direction_t dirs[4] = { MOTOR_DIR_CW, MOTOR_DIR_CW, MOTOR_DIR_CW, MOTOR_DIR_CW };
+    uint32_t speeds[4] = { 100, 100, 100, 100 };
+
+    TEST_ASSERT_FALSE(motor_service_rotate_all(&s_svc, dirs, speeds));
+}
+
+void test_motor_service_move_all_propagates_failure(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    motor_service_bind_driver(&s_svc, 0, &s_mock_driver);
+
+    memset(&s_fail_driver, 0, sizeof(s_fail_driver));
+    s_fail_driver.move_to = mock_move_to_fail;
+    motor_service_bind_driver(&s_svc, 1, &s_fail_driver);
+
+    int32_t positions[4] = { 10, 20, 30, 40 };
+    uint32_t speeds[4] = { 100, 100, 100, 100 };
+    motor_direction_t dirs[4] = { MOTOR_DIR_CW, MOTOR_DIR_CW, MOTOR_DIR_CW, MOTOR_DIR_CW };
+
+    TEST_ASSERT_FALSE(motor_service_move_all(&s_svc, positions, speeds, dirs));
+}
+
+void test_motor_service_stop_all_propagates_failure(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    motor_service_bind_driver(&s_svc, 0, &s_mock_driver);
+
+    memset(&s_fail_driver, 0, sizeof(s_fail_driver));
+    s_fail_driver.stop = mock_stop_fail;
+    motor_service_bind_driver(&s_svc, 1, &s_fail_driver);
+
+    TEST_ASSERT_FALSE(motor_service_stop_all(&s_svc));
+}
+
+void test_motor_service_update_skips_null_driver(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    s_svc.motors[0].actual_position = 111;
+    s_svc.motors[0].encoder_ticks = 222;
+
+    TEST_ASSERT_TRUE(motor_service_update(&s_svc));
+
+    TEST_ASSERT_EQUAL_INT32(111, s_svc.motors[0].actual_position);
+    TEST_ASSERT_EQUAL_INT32(222, s_svc.motors[0].encoder_ticks);
+}
+
+void test_motor_service_update_skips_null_getter_functions(void) {
+    motor_service_init(&s_svc, s_motors, 4);
+    memset(&s_null_fn_driver, 0, sizeof(s_null_fn_driver));
+    motor_service_bind_driver(&s_svc, 0, &s_null_fn_driver);
+
+    s_svc.motors[0].actual_position = 333;
+    s_svc.motors[0].encoder_ticks = 444;
+
+    TEST_ASSERT_TRUE(motor_service_update(&s_svc));
+
+    TEST_ASSERT_EQUAL_INT32(333, s_svc.motors[0].actual_position);
+    TEST_ASSERT_EQUAL_INT32(444, s_svc.motors[0].encoder_ticks);
+}

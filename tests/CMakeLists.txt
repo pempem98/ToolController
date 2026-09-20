@@ -21,16 +21,19 @@ set(TEST_SOURCES
     services/motor_service/test_motor_service.c
     services/brake_service/test_brake_service.c
     services/operator_service/test_operator_service.c
+    services/cli_service/test_cli_service.c
     connectivity/test_cli_protocol.c
     app/test_system_coordinator.c
+    app/test_rtos_tasks.c
     middleware/freertos/test_freertos_osal.c
     # Real drivers under test
     ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3zit6q/drivers/bldc_can_driver.c
     ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3zit6q/drivers/tmc2209_driver.c
     ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3zit6q/drivers/brake_driver.c
     ${CMAKE_CURRENT_LIST_DIR}/../platform/stm32h7a3zit6q/drivers/operator_input_driver.c
-    # System coordinator
+    # System coordinator & RTOS task orchestration logic (real, not stubbed)
     ${CMAKE_CURRENT_LIST_DIR}/../app/src/system_coordinator.c
+    ${CMAKE_CURRENT_LIST_DIR}/../app/src/rtos_tasks.c
 )
 
 add_executable(unit_tests ${TEST_SOURCES})
@@ -76,9 +79,14 @@ if(ENABLE_COVERAGE)
     endif()
 
     if(GCOVR_BIN)
+        # PYTHONUTF8=1 bat buoc tren Windows: gcovr (Python) mac dinh doc file nguon
+        # bang codepage he thong (vd cp1252) thay vi UTF-8, lam hong cac comment
+        # tieng Viet co dau (mojibake) trong bao cao HTML dau ra du file .c/.h goc
+        # hoan toan dung UTF-8. Bien nay ep Python 3.7+ dung UTF-8 cho toan bo I/O
+        # van ban bat ke codepage he thong dang active.
         add_custom_target(coverage_report
             COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/coverage_report
-            COMMAND ${GCOVR_BIN} --root ${CMAKE_SOURCE_DIR} ${GCOVR_GCOV_ARG} --filter services --filter connectivity --filter middleware --filter app --filter platform/stm32h7a3zit6q/drivers --exclude tests --exclude build --html --html-details -o ${CMAKE_BINARY_DIR}/coverage_report/index.html
+            COMMAND ${CMAKE_COMMAND} -E env PYTHONUTF8=1 ${GCOVR_BIN} --root ${CMAKE_SOURCE_DIR} ${GCOVR_GCOV_ARG} --filter services --filter connectivity --filter middleware --filter app --filter platform/stm32h7a3zit6q/drivers --exclude tests --exclude build --html --html-details -o ${CMAKE_BINARY_DIR}/coverage_report/index.html
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMENT "Generating HTML code coverage report in build/coverage_report/index.html..."
         )

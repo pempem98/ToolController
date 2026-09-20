@@ -3,11 +3,13 @@
 #include "board_interface.h"
 #include <string.h>
 
-void emergency_brake_task(void *pvParameters) { (void)pvParameters; }
-void motion_control_task(void *pvParameters) { (void)pvParameters; }
-void input_scan_task(void *pvParameters) { (void)pvParameters; }
-void console_task(void *pvParameters) { (void)pvParameters; }
-void rtos_notify_brake_event(void) {}
+/*
+ * emergency_brake_task/motion_control_task/input_scan_task/console_task/rtos_notify_brake_event
+ * KHÔNG còn stub ở đây kể từ khi app/src/rtos_tasks.c được thêm thật vào TEST_SOURCES
+ * (xem tests/CMakeLists.txt) để test logic thật của các *_task_step() trong
+ * tests/app/test_rtos_tasks.c. Định nghĩa 2 lần cùng một hàm sẽ gây lỗi linker
+ * "multiple definition" nếu file này khai báo lại.
+ */
 status_t board_init(void) { return STATUS_OK; }
 const board_hardware_t* board_get_hardware(void) { return NULL; }
 
@@ -82,6 +84,20 @@ void test_system_coordinator_trigger_emergency_brake(void) {
 
     system_coordinator_trigger_emergency_brake(&s_sys);
     TEST_ASSERT_TRUE(s_sys.emergency_brake_triggered);
+}
+
+/**
+ * @brief system_coordinator_start_tasks() phải tạo được cả 4 RTOS task theo đúng
+ *        phân tầng ưu tiên đã thiết kế và trả về true khi hoàn tất. Trên host,
+ *        osal_task_create() là stub trả handle giả (không chạy scheduler thật),
+ *        nên test này xác nhận đường gọi không crash và trả kết quả đúng hợp đồng
+ *        API, không xác nhận hành vi runtime thật của task (việc đó thuộc phạm vi
+ *        integration test / HIL trên target FreeRTOS thật).
+ */
+void test_system_coordinator_start_tasks_returns_true(void) {
+    system_coordinator_init(&s_sys, &s_mock_board);
+
+    TEST_ASSERT_TRUE(system_coordinator_start_tasks(&s_sys));
 }
 
 
