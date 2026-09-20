@@ -5,3 +5,8 @@ add_library(middleware_freertos STATIC
 )
 
 target_include_directories(middleware_freertos PUBLIC inc)
+ 
+if(NOT PLATFORM STREQUAL "host" AND NOT BUILD_TESTS)
+    target_compile_definitions(middleware_freertos PUBLIC USE_FREERTOS)
+    target_include_directories(middleware_freertos PRIVATE ${PLATFORM_INCLUDES})
+endif()

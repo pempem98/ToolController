@@ -44,4 +44,20 @@ description: >-
 4. **Watchdog (IWDG/WWDG) & Brown-out Root Cause Analysis**:
    - Check Reset Status Register (`RCC->CSR` or `RCC->RSR`) at startup to determine cause of reset (IWDG, WWDG, Low-Power, BOR, Pin Reset).
    - Save diagnostic crash record in Retentive Backup SRAM before system reset.
+5. **FreeRTOS Task Execution & Idle Task Trapping Triage**:
+   - **Hiện tượng**: Khi tạm dừng (pause) debugger, con trỏ luôn rơi vào `prvCheckTasksWaitingTermination()` trong `tasks.c` hoặc hàm Idle Task, các task ứng dụng hoàn toàn không chạy.
+   - **Nguyên nhân gốc rễ**:
+     1. *Silent Stub Fallback*: OSAL/Middleware được biên dịch từ sub-library thiếu cờ tiền xử lý (ví dụ: `-DUSE_FREERTOS`), khiến `osal_task_create()` rơi vào nhánh `#else` (Mock/Host stub) trả về dummy handle mà không hề gọi `xTaskCreate()`.
+     2. *Task Deletion Cascade*: Task khởi tạo duy nhất (ví dụ `defaultTask` sinh bởi CubeMX) gọi `osThreadExit()` / `vTaskDelete(NULL)`. Khi không còn task nào ở trạng thái Ready, Idle task sẽ liên tục chạy hàm `prvCheckTasksWaitingTermination()` để dọn dẹp bộ nhớ TCB/Stack.
+     3. *Heap Exhaustion*: `xTaskCreate()` thất bại do tràn heap FreeRTOS (`configTOTAL_HEAP_SIZE`), trả về `errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY`.
+   - **Kỹ thuật xác minh nhị phân (Binary Triage)**:
+     - Disassemble hàm tạo task trực tiếp từ ELF để kiểm tra lệnh gọi nhánh sang FreeRTOS:
+       ```bash
+       arm-none-eabi-objdump -d --disassemble=osal_task_create <path_to_elf>
+       ```
+       *Nếu thấy trả về hằng số (vd `movs r3, #1; bx lr`) thay vì gọi `bl <xTaskCreate>`, thư viện đang bị build ở chế độ Stub.*
+     - Liệt kê bảng ký hiệu task trong ELF:
+       ```bash
+       arm-none-eabi-nm <path_to_elf> | grep -E "xTaskCreate|<app_task_name>"
+       ```
 

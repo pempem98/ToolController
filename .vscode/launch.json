@@ -1,8 +1,16 @@
 {
     "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "debugElfPath",
+            "type": "promptString",
+            "description": "Nhập đường dẫn file ELF cần debug:",
+            "default": "build/app/surgical_instrument_controller_stm32h7a3zit6q.elf"
+        }
+    ],
     "configurations": [
         {
-            "name": "Debug STM32H7A3ZIT6Q (ST-Link Local Build)",
+            "name": "Debug STM32H7A3ZIT6Q (Local Build)",
             "type": "cortex-debug",
             "request": "launch",
             "servertype": "stlink",
@@ -12,29 +20,26 @@
             "interface": "swd",
             "runToEntryPoint": "main",
             "svdFile": "${workspaceFolder}/platform/stm32h7a3zit6q/stm32h7a3zit6q.svd",
-            "serverpath": "${env:LOCALAPPDATA}/stm32cube/bundles/stlink-gdbserver/7.14.0+st.2/bin/ST-LINK_gdbserver.exe",
-            "armToolchainPath": "${env:LOCALAPPDATA}/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin",
-            "stm32cubeprogrammer": "${env:LOCALAPPDATA}/stm32cube/bundles/programmer/2.23.0/bin",
-            "showDevDebugOutput": "none"
-        },
-        {
-            "name": "Debug STM32H7A3ZIT6Q (CI / Docker ELF Downloaded)",
-            "type": "cortex-debug",
-            "request": "launch",
-            "servertype": "stlink",
-            "cwd": "${workspaceFolder}",
-            "executable": "${workspaceFolder}/build/app/surgical_instrument_controller_stm32h7a3zit6q.elf",
-            "device": "STM32H7A3ZIT6Q",
-            "interface": "swd",
-            "runToEntryPoint": "main",
-            "svdFile": "${workspaceFolder}/platform/stm32h7a3zit6q/stm32h7a3zit6q.svd",
-            "serverpath": "${env:LOCALAPPDATA}/stm32cube/bundles/stlink-gdbserver/7.14.0+st.2/bin/ST-LINK_gdbserver.exe",
-            "armToolchainPath": "${env:LOCALAPPDATA}/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin",
-            "stm32cubeprogrammer": "${env:LOCALAPPDATA}/stm32cube/bundles/programmer/2.23.0/bin",
             "showDevDebugOutput": "none",
             "sourceFileMap": {
                 "/home/runner/work": "${workspaceFolder}/..",
-                "/workspace/surgical-instrument-controller": "${workspaceFolder}",
+                "/workspace": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Debug STM32H7A3ZIT6Q (Custom ELF Path)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "stlink",
+            "cwd": "${workspaceFolder}",
+            "executable": "${input:debugElfPath}",
+            "device": "STM32H7A3ZIT6Q",
+            "interface": "swd",
+            "runToEntryPoint": "main",
+            "svdFile": "${workspaceFolder}/platform/stm32h7a3zit6q/stm32h7a3zit6q.svd",
+            "showDevDebugOutput": "none",
+            "sourceFileMap": {
+                "/home/runner/work": "${workspaceFolder}/..",
                 "/workspace": "${workspaceFolder}"
             }
         }

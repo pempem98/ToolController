@@ -164,7 +164,9 @@ void osal_delay_ms(uint32_t ms) {
 #endif
 }
 
+#ifndef USE_FREERTOS
 static uint32_t g_host_tick_ms = 0;
+#endif
 
 uint32_t osal_get_tick_ms(void) {
 #ifdef USE_FREERTOS

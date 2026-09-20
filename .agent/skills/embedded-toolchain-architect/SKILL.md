@@ -128,7 +128,32 @@ description: >-
   2. *Ép biến trong Preset*: Đặt `"ENABLE_COVERAGE": "OFF"` tường minh cho preset `stm32h7a3zit6q`.
   3. *Tự động xóa cache bằng `--fresh`*: Luôn dùng `cmake --fresh --preset <preset_name>` trong tasks để tái tạo cấu hình sạch sẽ khi đổi kiến trúc.
 
-### H. Môi Trường Kiểm Thử Native & Báo Cáo Coverage HTML (`gcovr`)
+### H. Lan Truyền Cấu Hình Nền Tảng Cho Modular Sub-Libraries (Bẫy Silent Stubbing Trong CMake)
+
+- **Bối cảnh**: Kiến trúc module hóa thường tách các tầng thành thư viện riêng biệt (`interfaces/`, `middleware/`, `services/`, `app/`). Lớp OSAL (như `middleware_freertos`) thường hỗ trợ song song cả Host SIL (Mock Stub) và Hardware Target (Real FreeRTOS).
+- **Cạm bẫy**:
+  - Nếu `platform.cmake` chỉ được nạp ở tầng `app/CMakeLists.txt`, các biến `PLATFORM_INCLUDES` và `PLATFORM_DEFINES` (`-DUSE_FREERTOS`) sẽ KHÔNG tồn tại khi CMake xử lý thư mục con `middleware/` đứng trước.
+  - Khi `middleware_freertos` được biên dịch thành thư viện tĩnh độc lập mà không có cờ `USE_FREERTOS`, GCC sẽ âm thầm biên dịch nhánh Mock/Stub (`return 1;`) mà **hoàn toàn không báo lỗi biên dịch**.
+  - Hệ quả là file `.elf` vẫn link thành công, nhưng các tác vụ RTOS không bao giờ được tạo vào kernel.
+- **Giải pháp chuẩn hóa**:
+  1. Nạp tệp cấu hình phần cứng `platform.cmake` tại tệp `CMakeLists.txt` gốc (Root) khi biên dịch cho MCU:
+     ```cmake
+     if(NOT PLATFORM STREQUAL "host" AND NOT BUILD_TESTS)
+         if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/platform/${PLATFORM}/platform.cmake")
+             include("${CMAKE_CURRENT_LIST_DIR}/platform/${PLATFORM}/platform.cmake")
+         endif()
+     endif()
+     ```
+  2. Trong `middleware/freertos/CMakeLists.txt`, cấu hình định nghĩa rõ ràng:
+     ```cmake
+     if(NOT PLATFORM STREQUAL "host" AND NOT BUILD_TESTS)
+         target_compile_definitions(middleware_freertos PUBLIC USE_FREERTOS)
+         target_include_directories(middleware_freertos PRIVATE ${PLATFORM_INCLUDES})
+     endif()
+     ```
+
+
+### I. Môi Trường Kiểm Thử Native & Báo Cáo Coverage HTML (`gcovr`)
 
 - **Host Compiler**: MinGW-W64 16.1.0 UCRT POSIX được cài đặt qua WinGet tại:
   `$env:LOCALAPPDATA\Microsoft\WinGet\Packages\BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\mingw64\bin`.
