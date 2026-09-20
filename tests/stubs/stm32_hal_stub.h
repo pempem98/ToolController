@@ -36,11 +36,13 @@ typedef struct {
 // Mock GPIO ports
 extern GPIO_TypeDef stub_GPIOA;
 extern GPIO_TypeDef stub_GPIOB;
+extern GPIO_TypeDef stub_GPIOC;
 extern GPIO_TypeDef stub_GPIOD;
 extern GPIO_TypeDef stub_GPIOE;
 
 #define GPIOA (&stub_GPIOA)
 #define GPIOB (&stub_GPIOB)
+#define GPIOC (&stub_GPIOC)
 #define GPIOD (&stub_GPIOD)
 #define GPIOE (&stub_GPIOE)
 
@@ -57,11 +59,11 @@ extern GPIO_TypeDef stub_GPIOE;
 #define GPIO_PIN_14  ((uint16_t)0x4000U)
 #define GPIO_PIN_15  ((uint16_t)0x8000U)
 
-#define JOY_X_Pin             GPIO_PIN_2
+#define JOY_X_Pin             GPIO_PIN_3
 #define JOY_X_GPIO_Port       GPIOA
-#define JOY_Y_Pin             GPIO_PIN_3
-#define JOY_Y_GPIO_Port       GPIOA
-#define JOY_SW_Pin            GPIO_PIN_0
+#define JOY_Y_Pin             GPIO_PIN_0
+#define JOY_Y_GPIO_Port       GPIOC
+#define JOY_SW_Pin            GPIO_PIN_1
 #define JOY_SW_GPIO_Port      GPIOB
 #define STEP_1_Pin            GPIO_PIN_9
 #define STEP_1_GPIO_Port      GPIOE
@@ -87,10 +89,14 @@ extern ADC_HandleTypeDef hadc1;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart3;
 
+#define ADC_CALIB_OFFSET        0x00000000U
+#define ADC_SINGLE_ENDED        0x00000000U
+
 // HAL API prototypes
 void HAL_GPIO_WritePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
 GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
 HAL_StatusTypeDef HAL_ADC_Start_DMA(ADC_HandleTypeDef *hadc, uint32_t *pData, uint32_t Length);
+HAL_StatusTypeDef HAL_ADCEx_Calibration_Start(ADC_HandleTypeDef *hadc, uint32_t CalibrationMode, uint32_t SingleDiff);
 HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);
 HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
 

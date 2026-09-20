@@ -1,13 +1,5 @@
 {
     "version": "2.0.0",
-    "inputs": [
-        {
-            "id": "firmwarePath",
-            "type": "promptString",
-            "description": "Nhập đường dẫn file firmware (.hex / .elf) cần nạp:",
-            "default": "build/app/surgical_instrument_controller_stm32h7a3zit6q.hex"
-        }
-    ],
     "windows": {
         "options": {
             "shell": {
@@ -31,32 +23,14 @@
             "problemMatcher": "$gcc"
         },
         {
-            "label": "2. Flash Firmware to Board (Local Build -> ST-LINK)",
-            "type": "shell",
-            "command": "STM32_Programmer_CLI -c port=SWD -w build/app/surgical_instrument_controller_stm32h7a3zit6q.hex -v -rst",
-            "dependsOn": "1. Build Firmware (STM32H7A3ZIT6Q / NUCLEO-H7A3ZI-Q)",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "3. Flash Custom Firmware (Prompt Path -> ST-LINK)",
-            "type": "shell",
-            "command": "STM32_Programmer_CLI -c port=SWD -w \"${input:firmwarePath}\" -v -rst",
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "4. Rebuild Firmware (Clean & Build)",
+            "label": "2. Rebuild Firmware (Clean & Build)",
             "type": "shell",
             "command": "cmake --fresh --preset stm32h7a3zit6q && cmake --build --preset stm32h7a3zit6q --clean-first",
             "group": "build",
             "problemMatcher": "$gcc"
         },
         {
-            "label": "5. Run Unit Tests (Unity SIL)",
+            "label": "3. Run Unit Tests (Unity SIL)",
             "type": "shell",
             "command": "cmake --fresh --preset host-tests && cmake --build --preset host-tests && ctest --preset host-tests",
             "group": {
@@ -66,14 +40,14 @@
             "problemMatcher": "$gcc"
         },
         {
-            "label": "6. Run Unit Tests with Coverage (HTML Report)",
+            "label": "4. Run Unit Tests with Coverage (HTML Report)",
             "type": "shell",
             "command": "cmake --fresh --preset coverage && cmake --build --preset coverage && ctest --preset coverage && cmake --build --preset coverage --target coverage_report",
             "group": "test",
             "problemMatcher": "$gcc"
         },
         {
-            "label": "7. Clean All (build/)",
+            "label": "5. Clean All (build/)",
             "type": "shell",
             "command": "cmake -E rm -rf build",
             "group": "build",

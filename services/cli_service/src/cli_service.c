@@ -21,7 +21,7 @@ bool cli_service_init(cli_service_t *svc,
     svc->rx_index = 0;
     svc->last_telemetry_tick = 0;
     svc->telemetry_interval_ms = 500;
-    svc->telemetry_enabled = true;
+    svc->telemetry_enabled = (CLI_TELEMETRY_DEFAULT_ENABLED != 0);
 
     memset(svc->rx_buffer, 0, sizeof(svc->rx_buffer));
 

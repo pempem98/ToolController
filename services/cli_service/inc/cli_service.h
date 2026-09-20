@@ -15,6 +15,10 @@ extern "C" {
 
 #define CLI_SERVICE_RX_BUFFER_SIZE 128
 
+#ifndef CLI_TELEMETRY_DEFAULT_ENABLED
+#define CLI_TELEMETRY_DEFAULT_ENABLED 0
+#endif
+
 typedef struct {
     console_interface_t *console;
     motor_service_t     *motor_svc;

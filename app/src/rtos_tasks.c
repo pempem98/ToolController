@@ -196,6 +196,6 @@ void console_task(void *pvParameters) {
     (void)pvParameters;
     while (1) {
         console_task_step();
-        osal_delay_ms(50);
+        osal_delay_ms(20);
     }
 }

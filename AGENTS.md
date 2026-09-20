@@ -31,7 +31,7 @@ Toàn bộ chi tiết kỹ thuật được định nghĩa tại các rules con:
 ## 5. Quy Chuẩn Tự Trị, Điều Phối Subagent & Phê Duyệt Tự Động
 - Chi tiết quy tắc xem tại [`.agent/rules/autonomous_orchestration.md`](.agent/rules/autonomous_orchestration.md).
 - **Tự động phân tích & Ủy quyền**: Khi nhận lệnh từ **Kỹ sư V**, Lead Agent tự động phân rã bài toán và kích hoạt các subagent chuyên trách.
-- **Tự động phê duyệt trong Workspace**: Lead Agent tự động nghiệm thu, kiểm tra build, kiểm tra test và phê duyệt kết quả của các subagent đối với mọi thao tác bên trong workspace (`c:\workspace\ToolController`). **Kỹ sư V không cần phải xác nhận/review các bước nhỏ nhặt**.
+- **Tự động phê duyệt trong Workspace**: Lead Agent tự động nghiệm thu, kiểm tra build, kiểm tra test và phê duyệt kết quả của các subagent đối với mọi thao tác bên trong workspace. **Kỹ sư V không cần phải xác nhận/review các bước nhỏ nhặt**.
 - **Chỉ dừng hỏi Kỹ sư V khi**:
   1. Có yêu cầu xóa, sửa hoặc ghi đè file/thư mục **nằm ngoài workspace**.
   2. Các lệnh nguy hiểm làm mất dữ liệu không thể hoàn tác (`git reset --hard`, `git push --force`,...).

@@ -1,0 +1,31 @@
+# Auto detect text files and perform LF normalization on check-in
+* text=auto
+
+# Explicitly declare text files you want to always be normalized to LF in repo
+*.c text
+*.h text
+*.s text
+*.cpp text
+*.hpp text
+*.cmake text
+*.txt text
+*.md text
+*.json text
+*.yml text
+*.yaml text
+*.ioc text
+*.dockerignore text
+*.gitignore text
+
+# STMicroelectronics CubeMX generated code and vendor trees:
+# Normalize line endings so Windows CubeMX CRLF generation doesn't show false diffs
+platform/stm32h7a3zit6q/cubemx/** text=auto
+
+# Declare binary files
+*.bin binary
+*.hex binary
+*.elf binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.pdf binary

@@ -136,24 +136,36 @@ surgical-instrument-controller/
 
 ---
 
-## 🛠 3. Môi Trường & Công Cụ Yêu Cầu (Prerequisites)
+## 🛠 3. Môi Trường & Bảng Phiên Bản Toolchains (Windows vs Linux)
 
-Dự án sử dụng các công cụ tiêu chuẩn, cấu hình hoàn toàn qua biến môi trường tương đối (`${env:LOCALAPPDATA}` và `${env:SystemDrive}`):
+Dự án phân định rõ ràng các bộ công cụ theo 2 hệ điều hành thực thi, được phân giải động qua biến môi trường tương đối (`${env:LOCALAPPDATA}` và `${env:SystemDrive}`), bảo đảm tính tương thích và di động (Zero Hardcoded Paths):
 
-1. **Bộ biên dịch chéo ARM MCU**:
-   - `arm-none-eabi-gcc` v14.3.1 (đi kèm gói STM32Cube bundle).
-   - Đường dẫn: `$env:LOCALAPPDATA\stm32cube\bundles\gnu-tools-for-stm32\14.3.1+st.2\bin`.
-2. **Bộ biên dịch Host PC (SIL GoogleTest)**:
-   - MinGW-W64 GCC/G++ v16.1.0 UCRT (cài đặt qua WinGet `BrechtSanders.WinLibs.POSIX.UCRT`).
-   - Đường dẫn: `$env:LOCALAPPDATA\Microsoft\WinGet\Packages\BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\mingw64\bin`.
-3. **Công cụ Build & Generator**:
-   - `CMake` (v3.20+) và `Ninja`.
-   - Đường dẫn: `$env:LOCALAPPDATA\stm32cube\bundles\cmake\...` và `ninja\...`.
-4. **Công cụ sinh báo cáo Coverage HTML**:
-   - `gcovr` v8.6 (Python 3.13).
-   - Đường dẫn: `$env:LOCALAPPDATA\Programs\Python\Python313\Scripts\gcovr.exe`.
-5. **Nạp & Gỡ Lỗi Phần Cứng (Debug Probes)**:
-   - ST-LINK GDB Server & STM32CubeProgrammer CLI (trong thư mục cài đặt STM32CubeIDE).
+### 3.1. Môi Trường Windows (Phát triển Cục bộ & Nạp Mạch qua VS Code)
+*Dành cho lập trình hàng ngày, biên dịch firmware STM32, chạy Unit Test SIL và nạp/gỡ lỗi trực tiếp qua ST-LINK trên bo mạch NUCLEO-H7A3ZI-Q.*
+
+| Nhóm Chức Năng | Công Cụ / Trình Biên Dịch | Phiên Bản Chuẩn | Đường Dẫn Mặc Định / Nguồn Cài Đặt | Mục Đích Sử Dụng |
+| :--- | :--- | :--- | :--- | :--- |
+| **Biên dịch chéo MCU** | **ARM GNU GCC / G++ / ASM** | `14.3.1` (`14.3.1+st.2`) | `$env:LOCALAPPDATA\stm32cube\bundles\gnu-tools-for-stm32\14.3.1+st.2\bin\arm-none-eabi-gcc.exe` | Biên dịch firmware cho Cortex-M7 @ 280MHz (Double-Precision FPU). |
+| **Tiện ích nhị phân** | **ARM Binutils (objcopy, size)** | `2.43.1` | `.../bin/arm-none-eabi-objcopy.exe`<br/>`.../bin/arm-none-eabi-size.exe` | Xuất file nạp Intel HEX, Raw Binary (.bin) và thống kê dung lượng bộ nhớ. |
+| **Biên dịch Host (SIL)**| **MinGW-W64 GCC / G++** | `16.1.0` (UCRT POSIX) | `$env:LOCALAPPDATA\Microsoft\WinGet\Packages\BrechtSanders.WinLibs.*\mingw64\bin\gcc.exe` | Biên dịch 65 bài kiểm thử SIL (Unity) độc lập phần cứng trực tiếp trên PC. |
+| **Build System** | **CMake & Ninja** | `4.3.1` / `1.13.2` | `$env:LOCALAPPDATA\stm32cube\bundles\cmake\4.3.1+st.1\bin`<br/>`$env:LOCALAPPDATA\stm32cube\bundles\ninja\1.13.2+st.1\bin` | Cấu hình CMakePresets và thực thi biên dịch song song siêu tốc. |
+| **Đo kiểm Coverage** | **Python & gcovr** | Python `3.13.x` / gcovr `8.6` | `$env:LOCALAPPDATA\Programs\Python\Python313\Scripts\gcovr.exe` | Thu thập dữ liệu `.gcda/.gcno`, tạo báo cáo HTML Dashboard trực quan. |
+| **Gỡ lỗi phần cứng** | **ST-LINK GDB Server** | `7.14.0` (`7.14.0+st.2`) | `$env:LOCALAPPDATA\stm32cube\bundles\stlink-gdbserver\7.14.0+st.2\bin\ST-LINK_gdbserver.exe` | Máy chủ GDB điều khiển kết nối SWD qua mạch nạp ST-LINK V3 trên bo mạch. |
+| **Nạp chip MCU** | **STM32CubeProgrammer CLI** | `2.23.0` | `$env:LOCALAPPDATA\stm32cube\bundles\programmer\2.23.0\bin\STM32_Programmer_CLI.exe` | Công cụ giao tiếp nạp Flash, verify mã máy và reset vi điều khiển. |
+
+---
+
+### 3.2. Môi Trường Linux (Docker Container, WSL & CI/CD Pipeline)
+*Đóng băng môi trường tự động hóa (Reproducible Builds), bảo đảm tính nhất quán 100% giữa máy phát triển cá nhân và máy chủ GitHub Actions / GitLab CI.*
+
+| Nhóm Chức Năng | Thành Phần Môi Trường | Phiên Bản Chuẩn | Nguồn Cấu Hình / Package | Mục Đích Sử Dụng |
+| :--- | :--- | :--- | :--- | :--- |
+| **Hệ điều hành cơ sở** | **Ubuntu Linux (Base OS)** | `22.04 LTS` | `docker/Dockerfile` / GitHub Actions `ubuntu-latest` | Môi trường Linux chuẩn hóa, độc lập hoàn toàn với cấu hình máy Host. |
+| **Biên dịch chéo MCU** | **ARM GNU Toolchain** | `13.3.rel1` / `14.x` | Tải từ ARM Developer / APT Package | Tự động biên dịch firmware STM32H7 trên CI/CD Runner và Docker. |
+| **Biên dịch Host (SIL)**| **GCC / G++ 12** | `12.x` | Ubuntu Package Repository | Biên dịch và thực thi toàn bộ test cases Unity SIL trên môi trường Linux. |
+| **Build System** | **CMake & Ninja** | `3.28+` / `1.11+` | PIP & APT Package | Quản lý quy trình cấu hình và build tự động trong container. |
+| **Đo kiểm Coverage** | **Python 3 & gcovr** | Python `3.10+` / gcovr `8.x` | PIP Package (`pip3 install gcovr`) | Đo lường độ bao phủ mã nguồn, xuất báo cáo Step Summary & Cobertura XML. |
+| **Bộ nhớ đệm tăng tốc** | **Ccache** | `4.5+` | Volume `surgical_instrument_ccache_data` | Lưu bộ nhớ đệm biên dịch, giúp tái build trong Docker nhanh gấp 5 - 10 lần. |
 
 ---
 
@@ -161,14 +173,23 @@ Dự án sử dụng các công cụ tiêu chuẩn, cấu hình hoàn toàn qua 
 
 Toàn bộ các tác vụ biên dịch đều xuất ra thư mục duy nhất: **`build/`**.
 
-### Cách 1: Sử dụng phím tắt VS Code (Khuyến nghị)
-Nhấn tổ hợp phím **`Ctrl+Shift+B`** trên bàn phím để chọn tác vụ mong muốn:
-- **`1. Build Firmware (STM32H7A3ZIT6Q / NUCLEO-H7A3ZI-Q)`**: Tự động cấu hình và biên dịch firmware vi điều khiển STM32H7A3ZIT6Q, xuất file `.elf`, `.hex`, `.bin`.
-- **`2. Flash Firmware to Board (STM32H7A3ZIT6Q / ST-LINK)`**: Nạp firmware vào bo mạch qua STM32CubeProgrammer CLI.
-- **`3. Rebuild Firmware (Clean & Build)`**: Dọn dẹp và biên dịch lại toàn bộ firmware từ đầu.
-- **`4. Run Unit Tests (Unity SIL)`**: Biên dịch và chạy toàn bộ 65 bài kiểm thử Unity SIL trên PC.
-- **`5. Run Unit Tests with Coverage (HTML Report)`**: Chạy unit tests kèm đo độ bao phủ mã nguồn và tự động kết xuất báo cáo HTML trực quan.
-- **`6. Clean All (Firmware & Tests)`**: Dọn sạch thư mục `build/`.
+### Cách 1: Sử dụng giao diện và phím tắt VS Code (Khuyến nghị)
+
+#### A. Nạp và Debug Phần Cứng (F5 / Menu Run and Debug)
+Dự án hợp nhất toàn bộ cấu hình gỡ lỗi vào [`.vscode/launch.json`](.vscode/launch.json) chuẩn mực, cung cấp 4 profile chuyên dụng:
+* **`Debug STM32H7A3ZIT6Q (Local Build)`** *(Mặc định - Phím **F5**)*: Nạp file `.elf` vừa build vào vi điều khiển và dừng tại hàm `main()` để debug, soi biến, đặt breakpoint.
+* **`Flash & Run STM32H7A3ZIT6Q (Run Freely)`**: Nạp firmware vào chip và tự động ra lệnh `continue` cho board chạy thật ngay lập tức mà không dừng lại.
+* **`Debug STM32H7A3ZIT6Q (Custom ELF Path)`**: Cho phép nhập đường dẫn file ELF bất kỳ để debug.
+* **`Flash & Run STM32H7A3ZIT6Q (Custom ELF Path)`**: Cho phép nạp và chạy ngay file ELF bất kỳ.
+
+> **Mẹo**: Nhấn **`Ctrl+Shift+D`** để mở bảng điều khiển **Run and Debug** trên thanh Activity Bar bên trái.
+
+#### B. Phím Tắt Tác Vụ Tự Động (`Ctrl+Shift+B` hoặc Terminal -> Run Task)
+* **`1. Build Firmware (STM32H7A3ZIT6Q / NUCLEO-H7A3ZI-Q)`**: Tự động cấu hình fresh và biên dịch firmware vi điều khiển STM32H7A3ZIT6Q, xuất file `.elf`, `.hex`, `.bin`.
+* **`2. Rebuild Firmware (Clean & Build)`**: Dọn dẹp cache và biên dịch lại toàn bộ firmware từ đầu.
+* **`3. Run Unit Tests (Unity SIL)`**: Biên dịch và chạy toàn bộ 65 bài kiểm thử Unity SIL trên PC.
+* **`4. Run Unit Tests with Coverage (HTML Report)`**: Chạy unit tests kèm đo độ bao phủ mã nguồn và tự động kết xuất báo cáo HTML trực quan.
+* **`5. Clean All (build/)`**: Dọn sạch toàn bộ thư mục `build/`.
 
 ### Cách 2: Sử dụng dòng lệnh qua CMake Presets
 

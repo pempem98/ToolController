@@ -2,8 +2,12 @@
 #include "main.h"
 #include "adc.h"
 
-// Buffer nhận dữ liệu ADC1 qua DMA (2 kênh: PA2 - Rank 1, PA3 - Rank 2)
+// Buffer nhận dữ liệu ADC1 qua DMA trong vùng AXI SRAM (RAM) để DMA1 truy cập được
+#if defined(__GNUC__)
+static uint16_t s_adc_dma_raw[2] __attribute__((section(".dma_buffer"), aligned(32)));
+#else
 static uint16_t s_adc_dma_raw[2] __attribute__((aligned(32)));
+#endif
 static uint16_t *s_p_adc_buffer = s_adc_dma_raw;
 static bool s_adc_started = false;
 
@@ -23,6 +27,7 @@ static status_t stm32_operator_init(operator_input_interface_t *self) {
     if (!self) return STATUS_INVALID_PARAM;
 
     if (!s_adc_started) {
+        HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED);
         s_adc_dma_raw[0] = 32768;
         s_adc_dma_raw[1] = 32768;
         if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)s_adc_dma_raw, 2) == HAL_OK) {

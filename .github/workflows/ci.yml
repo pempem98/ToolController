@@ -36,17 +36,30 @@ jobs:
 
       - name: Cross-Compile STM32H7A3ZIT6Q Firmware (output to build/)
         run: |
+          echo "================================================================="
+          echo "  Configuring CMake: linux-stm32h7a3zit6q"
+          echo "================================================================="
           cmake --preset linux-stm32h7a3zit6q
-          cmake --build --preset linux-stm32h7a3zit6q
+          echo "================================================================="
+          echo "  Compiling Firmware: linux-stm32h7a3zit6q"
+          echo "================================================================="
+          cmake --build --preset linux-stm32h7a3zit6q -v
 
       - name: Generate Firmware Memory Summary
         run: |
-          echo "### 🛠️ STM32H7A3ZIT6Q (NUCLEO-H7A3ZI-Q) Firmware Build Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| File Type | File Name | Size (Bytes) |" >> $GITHUB_STEP_SUMMARY
-          echo "| :--- | :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "================================================================="
+          echo "  Firmware Memory & Section Sizes (arm-none-eabi-size)"
+          echo "================================================================="
+          arm-none-eabi-size -B build/app/surgical_instrument_controller_stm32h7a3zit6q.elf
+          arm-none-eabi-size -A -d build/app/surgical_instrument_controller_stm32h7a3zit6q.elf
           ELF_SIZE=$(stat -c%s "build/app/surgical_instrument_controller_stm32h7a3zit6q.elf" 2>/dev/null || echo "N/A")
           HEX_SIZE=$(stat -c%s "build/app/surgical_instrument_controller_stm32h7a3zit6q.hex" 2>/dev/null || echo "N/A")
           BIN_SIZE=$(stat -c%s "build/app/surgical_instrument_controller_stm32h7a3zit6q.bin" 2>/dev/null || echo "N/A")
+          echo "ELF: $ELF_SIZE bytes | HEX: $HEX_SIZE bytes | BIN: $BIN_SIZE bytes"
+
+          echo "### 🛠️ STM32H7A3ZIT6Q (NUCLEO-H7A3ZI-Q) Firmware Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| File Type | File Name | Size (Bytes) |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- | :--- |" >> $GITHUB_STEP_SUMMARY
           echo "| **ELF** | \`surgical_instrument_controller_stm32h7a3zit6q.elf\` | $ELF_SIZE |" >> $GITHUB_STEP_SUMMARY
           echo "| **HEX** | \`surgical_instrument_controller_stm32h7a3zit6q.hex\` | $HEX_SIZE |" >> $GITHUB_STEP_SUMMARY
           echo "| **BIN** | \`surgical_instrument_controller_stm32h7a3zit6q.bin\` | $BIN_SIZE |" >> $GITHUB_STEP_SUMMARY
@@ -113,29 +126,46 @@ jobs:
 
       - name: Build Unity Unit Tests with Coverage Flags
         run: |
+          echo "================================================================="
+          echo "  Configuring CMake: linux-coverage"
+          echo "================================================================="
           cmake --preset linux-coverage
-          cmake --build --preset linux-coverage
+          echo "================================================================="
+          echo "  Compiling Unit Tests with Coverage"
+          echo "================================================================="
+          cmake --build --preset linux-coverage -v
 
-      - name: Run Unit Tests & Collect Output
+      - name: Run Unit Tests & Stream Live Output
         id: run_tests
         run: |
-          ./build/tests/unit_tests > test_results.log 2>&1 || (cat test_results.log && exit 1)
-          cat test_results.log
+          set -o pipefail
+          echo "================================================================="
+          echo "  Running Unity Unit Tests (Live Streaming to Runner)"
+          echo "================================================================="
+          ./build/tests/unit_tests 2>&1 | tee test_results.log
 
       - name: Generate HTML Coverage Report
         run: |
-          cmake --build --preset linux-coverage --target coverage_report
+          echo "================================================================="
+          echo "  Generating Coverage Report via gcovr"
+          echo "================================================================="
+          cmake --build --preset linux-coverage --target coverage_report -v
 
-      - name: Publish Test Results & Coverage Report to Step Summary
+      - name: Publish Test Results & Coverage Report to Step Summary & Console
         if: always()
         run: |
-          echo "### 🧪 Unity Unit Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "================================================================="
+          echo "  Unit Test Summary"
+          echo "================================================================="
           if [ -f test_results.log ]; then
             TOTAL_TESTS=$(grep -oE "[0-9]+ Tests" test_results.log | head -1 | awk '{print $1}')
             FAILURES=$(grep -oE "[0-9]+ Failures" test_results.log | head -1 | awk '{print $1}')
             IGNORED=$(grep -oE "[0-9]+ Ignored" test_results.log | head -1 | awk '{print $1}')
             PASSED=$((TOTAL_TESTS - FAILURES - IGNORED))
 
+            echo "Total: $TOTAL_TESTS | Passed: $PASSED | Failures: $FAILURES | Ignored: $IGNORED"
+
+            echo "### 🧪 Unity Unit Test Results" >> $GITHUB_STEP_SUMMARY
             echo "| Test Status | Total Tests | Passed | Failures | Ignored |" >> $GITHUB_STEP_SUMMARY
             echo "| :---: | :---: | :---: | :---: | :---: |" >> $GITHUB_STEP_SUMMARY
             if [ "$FAILURES" -eq 0 ]; then
@@ -143,8 +173,21 @@ jobs:
             else
               echo "| 🔴 **FAILED** | $TOTAL_TESTS | $PASSED | $FAILURES | $IGNORED |" >> $GITHUB_STEP_SUMMARY
             fi
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "================================================================="
+          echo "  Code Coverage Summary (Console)"
+          echo "================================================================="
+          python3 -m gcovr --root . \
+            --filter services \
+            --filter connectivity \
+            --filter middleware \
+            --filter app \
+            --filter platform/stm32h7a3zit6q/drivers \
+            --exclude tests \
+            --exclude build \
+            --txt
 
           echo "### 📊 Code Coverage Summary (gcovr)" >> $GITHUB_STEP_SUMMARY
           python3 -m gcovr --root . \

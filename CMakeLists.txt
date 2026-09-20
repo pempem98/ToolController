@@ -24,6 +24,13 @@ set(CMAKE_CXX_STANDARD 17)
 
 option(BUILD_TESTS "Build unit tests for host PC" OFF)
 option(ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
+option(ENABLE_CLI_TELEMETRY "Enable periodic UART telemetry streaming at boot" OFF)
+
+if(ENABLE_CLI_TELEMETRY)
+    add_compile_definitions(CLI_TELEMETRY_DEFAULT_ENABLED=1)
+else()
+    add_compile_definitions(CLI_TELEMETRY_DEFAULT_ENABLED=0)
+endif()
 
 if(ENABLE_COVERAGE AND (PLATFORM STREQUAL "host" OR BUILD_TESTS))
     message(STATUS "Code coverage instrumentation ENABLED")

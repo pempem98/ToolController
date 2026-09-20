@@ -3,6 +3,7 @@
 
 GPIO_TypeDef stub_GPIOA;
 GPIO_TypeDef stub_GPIOB;
+GPIO_TypeDef stub_GPIOC;
 GPIO_TypeDef stub_GPIOD;
 GPIO_TypeDef stub_GPIOE;
 
@@ -62,6 +63,13 @@ HAL_StatusTypeDef HAL_ADC_Start_DMA(ADC_HandleTypeDef *hadc, uint32_t *pData, ui
     (void)hadc;
     (void)pData;
     (void)Length;
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_ADCEx_Calibration_Start(ADC_HandleTypeDef *hadc, uint32_t CalibrationMode, uint32_t SingleDiff) {
+    (void)hadc;
+    (void)CalibrationMode;
+    (void)SingleDiff;
     return HAL_OK;
 }
 

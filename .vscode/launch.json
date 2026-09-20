@@ -20,11 +20,22 @@
             "interface": "swd",
             "runToEntryPoint": "main",
             "svdFile": "${workspaceFolder}/platform/stm32h7a3zit6q/stm32h7a3zit6q.svd",
-            "showDevDebugOutput": "none",
-            "sourceFileMap": {
-                "/home/runner/work": "${workspaceFolder}/..",
-                "/workspace": "${workspaceFolder}"
-            }
+            "showDevDebugOutput": "none"
+        },
+        {
+            "name": "Flash & Run STM32H7A3ZIT6Q (Local Build)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "stlink",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/app/surgical_instrument_controller_stm32h7a3zit6q.elf",
+            "device": "STM32H7A3ZIT6Q",
+            "interface": "swd",
+            "runToEntryPoint": "",
+            "postLaunchCommands": [
+                "continue"
+            ],
+            "showDevDebugOutput": "none"
         },
         {
             "name": "Debug STM32H7A3ZIT6Q (Custom ELF Path)",
@@ -37,11 +48,22 @@
             "interface": "swd",
             "runToEntryPoint": "main",
             "svdFile": "${workspaceFolder}/platform/stm32h7a3zit6q/stm32h7a3zit6q.svd",
-            "showDevDebugOutput": "none",
-            "sourceFileMap": {
-                "/home/runner/work": "${workspaceFolder}/..",
-                "/workspace": "${workspaceFolder}"
-            }
+            "showDevDebugOutput": "none"
+        },
+        {
+            "name": "Flash & Run STM32H7A3ZIT6Q (Custom ELF Path)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "stlink",
+            "cwd": "${workspaceFolder}",
+            "executable": "${input:debugElfPath}",
+            "device": "STM32H7A3ZIT6Q",
+            "interface": "swd",
+            "runToEntryPoint": "",
+            "postLaunchCommands": [
+                "continue"
+            ],
+            "showDevDebugOutput": "none"
         }
     ]
 }

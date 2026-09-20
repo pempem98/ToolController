@@ -53,7 +53,7 @@ Khi cần thực thi, Lead Agent gọi `invoke_subagent` với các profile đ�
 ---
 
 ## 4. Quy Định Phê Duyệt (Self-Approval Boundaries)
-* **TỰ PHÊ DUYỆT**: Toàn bộ thao tác thêm, sửa, xóa, chạy test, build, commit git trong `c:\workspace\ToolController`.
-* **CHỈ HỎI KỸ SƯ V**: Khi có thao tác tác động ra ngoài thư mục `c:\workspace\ToolController` (ổ đĩa hệ thống, thư mục người dùng ngoài workspace).
+* **TỰ PHÊ DUYỆT**: Toàn bộ thao tác thêm, sửa, xóa, chạy test, build, commit git trong workspace dự án.
+* **CHỈ HỎI KỸ SƯ V**: Khi có thao tác tác động ra ngoài thư mục workspace dự án (ổ đĩa hệ thống, thư mục người dùng ngoài workspace).
 
 

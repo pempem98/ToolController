@@ -57,11 +57,11 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define JOY_X_Pin GPIO_PIN_2
+#define JOY_Y_Pin GPIO_PIN_0
+#define JOY_Y_GPIO_Port GPIOC
+#define JOY_X_Pin GPIO_PIN_3
 #define JOY_X_GPIO_Port GPIOA
-#define JOY_Y_Pin GPIO_PIN_3
-#define JOY_Y_GPIO_Port GPIOA
-#define JOY_SW_Pin GPIO_PIN_0
+#define JOY_SW_Pin GPIO_PIN_1
 #define JOY_SW_GPIO_Port GPIOB
 #define STEP_1_Pin GPIO_PIN_9
 #define STEP_1_GPIO_Port GPIOE
@@ -71,14 +71,14 @@ void Error_Handler(void);
 #define STEP_3_GPIO_Port GPIOE
 #define STEP_4_Pin GPIO_PIN_14
 #define STEP_4_GPIO_Port GPIOE
-#define SERIAL_TX_Pin GPIO_PIN_10
-#define SERIAL_TX_GPIO_Port GPIOB
-#define SERIAL_RX_Pin GPIO_PIN_11
-#define SERIAL_RX_GPIO_Port GPIOB
 #define TMC_TX_Pin GPIO_PIN_14
 #define TMC_TX_GPIO_Port GPIOB
 #define TMC_RX_Pin GPIO_PIN_15
 #define TMC_RX_GPIO_Port GPIOB
+#define SERIAL_TX_Pin GPIO_PIN_8
+#define SERIAL_TX_GPIO_Port GPIOD
+#define SERIAL_RX_Pin GPIO_PIN_9
+#define SERIAL_RX_GPIO_Port GPIOD
 #define DIR_1_Pin GPIO_PIN_0
 #define DIR_1_GPIO_Port GPIOD
 #define DIR_2_Pin GPIO_PIN_1

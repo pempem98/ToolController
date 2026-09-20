@@ -14,7 +14,7 @@
 
 ### 2.1. Nhóm tác vụ Agent TỰ ĐỘNG PHÊ DUYỆT (Không cần hỏi Kỹ sư V)
 Agent có toàn quyền tự động ra quyết định, triển khai và phê duyệt trong các trường hợp sau:
-1. **Mọi thao tác trong phạm vi Workspace (`c:\workspace\ToolController`)**:
+1. **Mọi thao tác trong phạm vi Workspace**:
    - Đọc, tạo mới, chỉnh sửa, định dạng, refactor mã nguồn (`.c`, `.h`, `.cpp`, `.cmake`, `.json`, `.md`,...).
    - Tạo mới thư mục, cấu trúc file, dockerfile, scripts cấu hình.
    - Thêm/sửa unit tests, mock, stub.

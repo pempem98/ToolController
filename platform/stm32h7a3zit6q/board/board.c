@@ -19,8 +19,8 @@ static motor_interface_t          s_motors[BOARD_MAX_MOTORS];
 static can_interface_t            s_motor_can_bus;
 static uart_interface_t           s_console_uart;
 static uart_interface_t           s_tmc_uart;
-static uint8_t                    s_console_uart_priv[16];
-static uint8_t                    s_tmc_uart_priv[16];
+static stm32_uart_priv_t         s_console_uart_priv;
+static stm32_uart_priv_t         s_tmc_uart_priv;
 
 // Driver private memory
 static tmc2209_motor_priv_t       s_tmc_priv[2];
@@ -48,15 +48,17 @@ status_t board_init(void) {
     // 2. Bảng điều khiển người vận hành (4 chiết áp ADC1 DMA + nút bấm PB0)
     operator_input_driver_create(&s_operator_input);
 
-    // 3. Cổng UART Console (USART3 - PB10/PB11) bọc thành console_interface_t
-    uart_mcal_create(&s_console_uart, s_console_uart_priv, &huart3);
+    // 3. Cổng UART Console (USART3 - PD8/PD9) bọc thành console_interface_t
+    uart_mcal_create(&s_console_uart, &s_console_uart_priv, &huart3);
+    s_console_uart.init(&s_console_uart, 115200);
     s_console.write = console_write;
     s_console.read = console_read;
     s_console.priv_data = &s_console_uart;
 
     // 4. Kênh truyền MCAL phục vụ Motor Drivers:
     can_mcal_create(&s_motor_can_bus);
-    uart_mcal_create(&s_tmc_uart, s_tmc_uart_priv, &huart1);
+    uart_mcal_create(&s_tmc_uart, &s_tmc_uart_priv, &huart1);
+    s_tmc_uart.init(&s_tmc_uart, 115200);
 
     // 5. Cấu hình 4 động cơ:
     // Prototype 1 (Trục 0 & 1): TMC2209 Stepper Drivers (Step/Dir + UART)

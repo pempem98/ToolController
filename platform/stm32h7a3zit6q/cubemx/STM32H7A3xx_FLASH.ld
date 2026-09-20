@@ -228,6 +228,14 @@ SECTIONS
   PROVIDE( __bss_start = __tbss_start );
   PROVIDE( __bss_size = __bss_end - __bss_start );
 
+  /* DMA buffer in AXI SRAM accessible by all DMA masters */
+  .dma_buffer (NOLOAD) : ALIGN(32)
+  {
+    *(.dma_buffer)
+    *(.dma_buffer*)
+    . = ALIGN(32);
+  } >RAM
+
   /* User_heap_stack section, used to check that there is enough RAM left */
   ._user_heap_stack (NOLOAD) :
   {
