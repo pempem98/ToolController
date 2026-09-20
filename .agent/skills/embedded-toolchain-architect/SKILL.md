@@ -153,6 +153,16 @@ description: >-
      ```
 
 
+### I.1. Mojibake Tiếng Việt Trong Báo Cáo Coverage HTML Trên Windows (`gcovr` + `PYTHONUTF8`)
+
+- **Hiện tượng**: Comment tiếng Việt có dấu trong source `.c`/`.h` (hoàn toàn đúng UTF-8, hiển thị đúng trong editor/git) bị hiển thị sai (mojibake, VD `trực ti�`) trong báo cáo `build/coverage_report/index.*.html`, dù file HTML khai báo `<meta charset="UTF-8">`.
+- **Nguyên nhân gốc rễ**: `gcovr` chạy trên Python, và trên Windows, Python mặc định đọc file văn bản (kể cả `.c`/`.h` nguồn) bằng **codepage hệ thống** (`locale.getpreferredencoding()`, thường là `cp1252`), không phải UTF-8, trừ khi ép buộc. Khi source chứa ký tự đa byte UTF-8 (tiếng Việt có dấu), việc decode sai bằng `cp1252` làm hỏng ký tự trước khi gcovr ghi ra HTML.
+- **Đây KHÔNG phải lỗi trong source code** — không cần sửa/xoá comment tiếng Việt để né vấn đề này.
+- **Giải pháp chuẩn**: Ép Python dùng UTF-8 cho toàn bộ I/O văn bản qua biến môi trường `PYTHONUTF8=1` (hỗ trợ từ Python 3.7+, PEP 540). Áp dụng ở 2 nơi:
+  1. `tests/CMakeLists.txt`, target `coverage_report`: bọc lệnh gọi `${GCOVR_BIN}` bằng `${CMAKE_COMMAND} -E env PYTHONUTF8=1 ...` (portable, không cần set biến môi trường thủ công trước khi build).
+  2. `.vscode/settings.json`: thêm `"PYTHONUTF8": "1"` vào cả `cmake.environment` và `terminal.integrated.env.windows` để môi trường IDE nhất quán khi chạy gcovr thủ công qua terminal.
+- **Không cần sửa trên Linux/CI**: Ubuntu mặc định `locale` là `UTF-8`, `gcovr` trong `.github/workflows/ci.yml` không gặp vấn đề này, nhưng thêm `PYTHONUTF8=1` không gây hại nếu muốn nhất quán.
+
 ### I. Môi Trường Kiểm Thử Native & Báo Cáo Coverage HTML (`gcovr`)
 
 - **Host Compiler**: MinGW-W64 16.1.0 UCRT POSIX được cài đặt qua WinGet tại:

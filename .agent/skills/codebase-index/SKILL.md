@@ -112,9 +112,13 @@ Mọi công cụ biên dịch, liên kết và kiểm thử trên máy tính c�
 - [`docker/Dockerfile`](docker/Dockerfile): Image Docker chuẩn hóa Ubuntu 22.04, ARM GCC 13.3, GCC 12, CMake, Ninja, gcovr.
 - [`docker-compose.yml`](docker-compose.yml): Rút gọn lệnh build container và quản lý volume.
 - [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json): VS Code Dev Container cấu hình môi trường phát triển 1-click.
-- [`AGENTS.md`](AGENTS.md): Bản đồ nguyên tắc Persona và Điều Phối Tự Trị.
-- [`.agent/rules/autonomous_orchestration.md`](.agent/rules/autonomous_orchestration.md): Quy chuẩn tự trị và phê duyệt nội bộ workspace.
-- [`.agent/skills/autonomous-orchestration/SKILL.md`](.agent/skills/autonomous-orchestration/SKILL.md): Kỹ năng điều phối multi-agent và self-approval.
+- [`AGENTS.md`](AGENTS.md): Bản đồ nguyên tắc Persona và Điều Phối Tự Trị (điểm vào chuẩn cho Claude Code, Gemini CLI, ChatGPT/Codex).
+- [`GEMINI.md`](GEMINI.md): File trỏ mỏng cho Gemini CLI, tránh trùng lặp nội dung với `AGENTS.md`.
+- [`.agent/rules/autonomous_orchestration.md`](.agent/rules/autonomous_orchestration.md): Ma trận phê duyệt tự động vs. phải hỏi Kỹ sư V.
+- [`.agent/rules/orchestration_protocol.md`](.agent/rules/orchestration_protocol.md): Giao thức Orchestrator/Worker/Verifier, giới hạn cứng 4 Worker + 2 Verifier, kiểm tra chéo bắt buộc.
+- [`.agent/rules/platform_adapters.md`](.agent/rules/platform_adapters.md): Ánh xạ cơ chế subagent giữa Claude Code, Gemini CLI, ChatGPT/Codex.
+- [`.agent/skills/orchestrator/SKILL.md`](.agent/skills/orchestrator/SKILL.md): Quy trình vận hành rút gọn để kích hoạt điều phối đa agent.
+- [`.agent/skills/autonomous-orchestration/SKILL.md`](.agent/skills/autonomous-orchestration/SKILL.md): (Bản cũ, giữ tương thích ngược) Kỹ năng điều phối multi-agent và self-approval.
 - [`.vscode/tasks.json`](.vscode/tasks.json): Tasks biên dịch tự động.
 - [`.vscode/settings.json`](.vscode/settings.json): Cấu hình cortex-debug và toolchain paths.
 - [`README.md`](README.md): Tài liệu hướng dẫn chính thức.

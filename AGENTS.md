@@ -28,11 +28,15 @@ Toàn bộ chi tiết kỹ thuật được định nghĩa tại các rules con:
 - **Tự động cung cấp Direct File Link**: Mỗi khi tạo hoặc cập nhật các file Artifact (như `implementation_plan.md`, `walkthrough.md`, báo cáo kiến trúc), **bắt buộc** phải chèn sẵn đường dẫn liên kết dạng `file:///...` nổi bật ngay trong câu trả lời.
 - **Mục đích**: Giúp **Kỹ sư V** có thể click trực tiếp mở file ngay trong VS Code Editor mà không cần tìm kiếm thủ công trong thư mục cache Antigravity.
 
-## 5. Quy Chuẩn Tự Trị, Điều Phối Subagent & Phê Duyệt Tự Động
-- Chi tiết quy tắc xem tại [`.agent/rules/autonomous_orchestration.md`](.agent/rules/autonomous_orchestration.md).
-- **Tự động phân tích & Ủy quyền**: Khi nhận lệnh từ **Kỹ sư V**, Lead Agent tự động phân rã bài toán và kích hoạt các subagent chuyên trách.
-- **Tự động phê duyệt trong Workspace**: Lead Agent tự động nghiệm thu, kiểm tra build, kiểm tra test và phê duyệt kết quả của các subagent đối với mọi thao tác bên trong workspace. **Kỹ sư V không cần phải xác nhận/review các bước nhỏ nhặt**.
+## 5. Quy Chuẩn Tự Trị, Điều Phối Multi-Agent & Phê Duyệt Tự Động
+- **Ma trận phê duyệt** (việc gì tự làm, việc gì phải hỏi): [`.agent/rules/autonomous_orchestration.md`](.agent/rules/autonomous_orchestration.md).
+- **Giao thức điều phối đa agent** (Orchestrator/Worker/Verifier, giới hạn tải, kiểm tra chéo bắt buộc): [`.agent/rules/orchestration_protocol.md`](.agent/rules/orchestration_protocol.md).
+- **Ánh xạ đa nền tảng** (Claude Code / Gemini CLI / ChatGPT-Codex cùng dùng chung giao thức này): [`.agent/rules/platform_adapters.md`](.agent/rules/platform_adapters.md).
+- Tóm tắt cơ chế: Chỉ kích hoạt multi-agent khi việc đủ lớn/đa chuyên môn (skill [`orchestrator`](.agent/skills/orchestrator/SKILL.md)). Giới hạn cứng **tối đa 4 Worker + 2 Verifier đồng thời**. Verifier bắt buộc khác Worker đã tạo ra thay đổi (không tự chấm bài mình), tự chạy lại build/test độc lập. Tối đa 2 vòng sửa lỗi trước khi dừng hỏi Kỹ sư V.
+- **Tự động phê duyệt trong Workspace**: Lead Agent tự động nghiệm thu, kiểm tra build, kiểm tra test và phê duyệt kết quả của các subagent đối với mọi thao tác bên trong workspace **sau khi đã qua bước kiểm tra chéo**. **Kỹ sư V không cần phải xác nhận/review các bước nhỏ nhặt**.
 - **Chỉ dừng hỏi Kỹ sư V khi**:
   1. Có yêu cầu xóa, sửa hoặc ghi đè file/thư mục **nằm ngoài workspace**.
   2. Các lệnh nguy hiểm làm mất dữ liệu không thể hoàn tác (`git reset --hard`, `git push --force`,...).
+  3. Verifier và Worker bất đồng quá 2 vòng mà không hội tụ.
+  4. Hai Worker xung đột phạm vi (muốn sửa cùng 1 file cùng lúc).
 
