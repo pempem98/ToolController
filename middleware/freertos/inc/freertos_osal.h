@@ -39,6 +39,24 @@ bool osal_timer_stop(osal_timer_t tmr);
 void osal_delay_ms(uint32_t ms);
 uint32_t osal_get_tick_ms(void);
 
+/**
+ * @brief Vào vùng tới hạn (critical section) để bảo vệ truy cập nguyên tử tới biến/cờ
+ *        được chia sẻ giữa nhiều task (VD: cờ trạng thái an toàn dùng bởi nhiều RTOS task).
+ *
+ * @details Trên FreeRTOS, bọc `taskENTER_CRITICAL()` (tắt ngắt tối thiểu, không dùng cho
+ *          các đoạn code dài vì sẽ trễ ngắt hệ thống). Trên Host (không FreeRTOS), là no-op
+ *          vì test SIL chạy đơn luồng.
+ *
+ * @warning Luôn phải gọi osal_exit_critical() ngay sau, đoạn code ở giữa phải cực ngắn
+ *          (chỉ đọc/ghi 1 biến), không được gọi hàm block hoặc delay bên trong.
+ */
+void osal_enter_critical(void);
+
+/**
+ * @brief Thoát vùng tới hạn đã vào bằng osal_enter_critical().
+ */
+void osal_exit_critical(void);
+
 #ifdef __cplusplus
 }
 #endif

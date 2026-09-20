@@ -74,11 +74,17 @@ void input_scan_task_step(void) {
     operator_service_update(&g_sys.op_svc);
 
     if (operator_service_is_brake_requested(&g_sys.op_svc)) {
-        if (!g_sys.emergency_brake_triggered) {
+        osal_enter_critical();
+        bool already_triggered = g_sys.emergency_brake_triggered;
+        osal_exit_critical();
+
+        if (!already_triggered) {
             system_coordinator_trigger_emergency_brake(&g_sys);
         }
     } else {
+        osal_enter_critical();
         g_sys.emergency_brake_triggered = false;
+        osal_exit_critical();
     }
 }
 
@@ -119,7 +125,11 @@ void input_scan_task(void *pvParameters) {
  * @note Tách hàm phục vụ kiểm thử SIL (Software-in-the-Loop) độc lập.
  */
 void motion_control_task_step(void) {
-    if (g_sys.emergency_brake_triggered) {
+    osal_enter_critical();
+    bool brake_triggered = g_sys.emergency_brake_triggered;
+    osal_exit_critical();
+
+    if (brake_triggered) {
         brake_service_engage(&g_sys.brake_svc);
         motor_service_stop_all(&g_sys.motor_svc);
         motor_service_update(&g_sys.motor_svc);

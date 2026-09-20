@@ -96,6 +96,8 @@ bool system_coordinator_start_tasks(system_coordinator_t *sys) {
  */
 void system_coordinator_trigger_emergency_brake(system_coordinator_t *sys) {
     if (!sys) return;
+    osal_enter_critical();
     sys->emergency_brake_triggered = true;
+    osal_exit_critical();
     rtos_notify_brake_event();
 }

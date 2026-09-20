@@ -175,3 +175,16 @@ uint32_t osal_get_tick_ms(void) {
     return g_host_tick_ms++;
 #endif
 }
+
+void osal_enter_critical(void) {
+#ifdef USE_FREERTOS
+    taskENTER_CRITICAL();
+#endif
+    /* Host build (SIL): đơn luồng, không cần đồng bộ hoá -> no-op. */
+}
+
+void osal_exit_critical(void) {
+#ifdef USE_FREERTOS
+    taskEXIT_CRITICAL();
+#endif
+}

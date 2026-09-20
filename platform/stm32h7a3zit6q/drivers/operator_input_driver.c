@@ -1,6 +1,23 @@
 #include "operator_input_driver.h"
 #include "main.h"
 #include "adc.h"
+/*
+ * CMSIS Core chỉ khả dụng khi build cho target STM32 thật (USE_FREERTOS được
+ * platform.cmake định nghĩa). Khi build cho Host SIL unit test, "main.h"/"adc.h"
+ * được resolve qua tests/stubs/stm32_hal_stub.h (không có CMSIS thật) nên phải
+ * loại trừ include này để tránh lỗi "cmsis_compiler.h: No such file or directory".
+ */
+#ifdef USE_FREERTOS
+#include "cmsis_compiler.h"
+#include "core_cm7.h"
+#endif
+
+/**
+ * @def OPERATOR_ADC_DMA_CACHE_LINE_SIZE
+ * @brief Kích thước dòng D-Cache Cortex-M7 (32 bytes), dùng làm vùng invalidate tối thiểu
+ *        cho buffer DMA trước mỗi lần CPU đọc, đảm bảo không đọc phải dữ liệu cache cũ.
+ */
+#define OPERATOR_ADC_DMA_CACHE_LINE_SIZE (32)
 
 // Buffer nhận dữ liệu ADC1 qua DMA trong vùng AXI SRAM (RAM) để DMA1 truy cập được
 #if defined(__GNUC__)
@@ -40,6 +57,18 @@ static status_t stm32_operator_init(operator_input_interface_t *self) {
 static status_t stm32_operator_read_axis(operator_input_interface_t *self, uint8_t axis, float *value) {
     (void)self;
     if (!value || axis >= OPERATOR_MAX_AXES) return STATUS_INVALID_PARAM;
+
+#ifdef USE_FREERTOS
+    /*
+     * D-Cache Coherency (Cortex-M7): buffer s_adc_dma_raw được DMA1 ghi trực tiếp vào RAM,
+     * không đi qua CPU cache. Bắt buộc invalidate D-Cache trước khi đọc để tránh CPU trả về
+     * giá trị cache cũ (stale) thay vì dữ liệu ADC mới nhất DMA vừa ghi. Chỉ áp dụng cho
+     * buffer mặc định do DMA ghi; buffer override (unit test) không cần vì không có DMA.
+     */
+    if (s_p_adc_buffer == s_adc_dma_raw) {
+        SCB_InvalidateDCache_by_Addr((volatile void *)s_adc_dma_raw, (int32_t)OPERATOR_ADC_DMA_CACHE_LINE_SIZE);
+    }
+#endif
 
     if (axis == OPERATOR_AXIS_0) {
         *value = operator_input_compute_axis_norm(s_p_adc_buffer[0]);
